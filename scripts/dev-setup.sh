@@ -37,7 +37,22 @@ install_profile() {
     fi
     cp "$template_dir/$file" "$dir/$file"
   done
+  link_workbench "$dir" "$label"
   echo "  $label: profile 基线已装到 $dir"
+}
+
+# bundle 名的解析是双锚点的:先从 dsh installation,再从 profile 目录。
+# 工作台包不在 desktop-host 的依赖闭包里,所以必须在 profile 的 node_modules
+# 里放一个指向工作区包的软链,否则 bundle 解析会静默失败。
+link_workbench() {
+  local dir="$1"
+  local label="$2"
+  local package_dir="$repo_root/packages/experimental/workbench"
+  [ -d "$package_dir" ] || return 0
+  local scope="$dir/node_modules/@deepseek-ai"
+  mkdir -p "$scope"
+  ln -sfn "$package_dir" "$scope/dsh-workbench"
+  echo "  $label: 已链接 $scope/dsh-workbench -> $package_dir"
 }
 
 echo "自媒体工作台 · profile 基线安装"

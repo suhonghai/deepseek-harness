@@ -671,6 +671,7 @@
       "@deepseek-ai/dsh-webhook-github": ["./packages/experimental/webhook-github/src"],
       "@deepseek-ai/dsh-wecom": ["./packages/connector/wecom/src"],
       "@deepseek-ai/dsh-win32-process": ["./packages/subprocess/win32-process/src"],
+      "@deepseek-ai/dsh-workbench": ["./packages/experimental/workbench/src"],
       "@deepseek-ai/dsh-workflow": ["./packages/workflow/workflow/src"],
       "@deepseek-ai/dsh-workflow-ptc": ["./packages/workflow/workflow-ptc/src"],
       "@deepseek-ai/dsh-working-directory": ["./packages/session/working-directory/src"],

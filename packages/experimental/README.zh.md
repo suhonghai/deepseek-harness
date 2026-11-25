@@ -76,6 +76,7 @@ kind: "package-group"
 | [`cua-bundle`](cua-bundle/README.zh.md) | 面向 PTC 会话、默认关闭的 Computer Use 开关 | — |
 | [`cua-mcp`](cua-mcp/README.zh.md) | 由 `cua-mcp` profile 向外部 agent harness 提供的 Computer Use MCP stdio 服务器 | — |
 | [`timeline`](timeline/README.zh.md) | 当前会话的任务树、进度条与间隔报告 | `ctx.timeline` |
+| [`workbench`](workbench/README.zh.md) | 内容生产的工作台面板:与作者一起打磨的生成提示词,以及文章、素材与发布这几块面 | — |
 | [`computer-use-cua-driver-mcp`](computer-use-cua-driver-mcp/README.zh.md) | 通过 MCP 使用已安装的 Cua Driver | `ctx.computerUse` |
 | [`computer-use-cua-driver-native`](computer-use-cua-driver-native/README.zh.md) | 嵌入 Cua Driver 原生 npm 运行时 | `ctx.computerUse` |
 | [`browser-use-playwright-mcp`](browser-use-playwright-mcp/README.zh.md) | 通过 MCP 提供 Playwright 浏览器工具 | `ctx.browserUse` |

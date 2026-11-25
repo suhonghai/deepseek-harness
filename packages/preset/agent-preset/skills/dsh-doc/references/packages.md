@@ -262,6 +262,7 @@ Every package below exports a Cordis plugin that a bundle patch can name in a Lo
 | `@deepseek-ai/dsh-tool-terminal` | yes | Six model-facing persistent PTY tools with owner isolation and generic background-job integration |
 | `@deepseek-ai/dsh-webhook` | no | Fire-and-forget webhook rule runtime that creates Workspace-backed DeepSeek Harness Sessions |
 | `@deepseek-ai/dsh-webhook-github` | yes | Signed GitHub HTTP webhook adapter for the DeepSeek Harness webhook runtime |
+| `@deepseek-ai/dsh-workbench` | no | 自媒体工作台:文章生成提示词编辑、素材与发布管理,复用 DSH 标准模式的 agent 能力 |
 
 ## extensions
 
