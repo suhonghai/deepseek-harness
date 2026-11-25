@@ -1,0 +1,192 @@
+# 自媒体工作台 —— desktop profile 基线
+#
+# 这是 profile 的 patch 层,应用在所有 bundle 层之后。行按 id 定位覆盖整行 config
+# (不深合并),所以覆写一个插件行时只写需要改的键。
+#
+# 本文件进版本控制,换机器时用 `bash scripts/dev-setup.sh` 装到 DSH_HOME。
+# 密钥不在这里 —— 模型凭据走环境变量(见 llm-pi-ai 的 apiKeyEnv)。
+
+# ---------------------------------------------------------------- 默认模型
+- id: agent-default-model
+  name: "@deepseek-ai/dsh-agent-default-model"
+  config:
+    provider: minimax
+    model: MiniMax-M3
+    reasoningEffort: high
+
+# ---------------------------------------------------------------- 模型目录
+- id: llm-pi-ai
+  name: "@deepseek-ai/dsh-llm-pi-ai"
+  config:
+    providers:
+      minimax:
+        models:
+          - id: MiniMax-M2.7
+            name: MiniMax-M2.7
+            contextWindow: 204800
+            maxTokens: 131072
+            input:
+              - text
+          - id: MiniMax-M2.7-highspeed
+            name: MiniMax-M2.7-highspeed
+            contextWindow: 204800
+            maxTokens: 131072
+            input:
+              - text
+          - id: MiniMax-M3
+            name: MiniMax-M3
+            contextWindow: 1000000
+            maxTokens: 512000
+            input:
+              - text
+              - image
+    apiKeyEnv: MINIMAX_API_KEY
+
+# ---------------------------------------------------------------- 界面偏好
+- id: ui-settings-account
+  name: "@deepseek-ai/dsh-client-ui-settings-account"
+  config:
+    version: 1
+    step: done
+    purpose: development
+    process: detailed
+    completion: completed
+    usage: detailed
+    developerTools: true
+
+- id: ui-chat
+  name: "@deepseek-ai/dsh-client-ui-chat"
+  config:
+    transcriptView: detailed
+    performanceUsage: detailed
+
+- id: ui-settings
+  name: "@deepseek-ai/dsh-client-ui-settings"
+  config:
+    enabled: true
+
+# =================================================================
+# 入口删减
+# =================================================================
+# 每一条关掉一个插件行,连带它注册的 slot 一起消失(禁用发生在插件加载之前)。
+# 依赖它的其它插件会静默失效,不会崩 —— slot 未声明时 inject 回调不执行。
+
+# ------------------------------------------------ 开发者 / 平台向入口
+# 普通创作者不该看到装插件、造插件、MCP 配置这些东西。
+- id: ui-plugin-manager
+  disabled: true
+
+- id: entry-customization
+  disabled: true
+
+- id: ui-cordis
+  disabled: true
+
+- id: mcp-manager
+  disabled: true
+
+- id: mcp-account
+  disabled: true
+
+- id: ui-connector-account
+  disabled: true
+
+# Plugins 页内的四个配置分区(随 ui-plugin-manager 一起关掉)。
+- id: ui-settings-subagent
+  disabled: true
+
+- id: ui-settings-agent-loop
+  disabled: true
+
+- id: ui-settings-web-search
+  disabled: true
+
+- id: ui-settings-shell
+  disabled: true
+
+# ------------------------------------------------ 与内容创作无关的能力
+# 定时任务:自媒体场景不需要定时触发。
+#
+# 只关客户端 UI,保留宿主 `schedule` service —— standard preset 里有 tool-schedule,
+# 它直接调 ctx.schedule.deliveryLimits();宿主 service 一旦禁用,agent 调用该工具会崩。
+# 要彻底移除定时能力,得在自有 preset 里去掉 tool-schedule 行,才能一并关掉宿主 schedule。
+- id: ui-schedule
+  disabled: true
+
+# 子 Agent / Agent 团队:初期隐藏,普通用户理解成本高。
+# (agent 平面的 tool-subagent 仍在 preset 里,只是没有界面入口。)
+- id: ui-subagent
+  disabled: true
+
+- id: ui-agent-team
+  disabled: true
+
+# 后台任务、目标、轨迹视图、会话面板。
+- id: ui-jobs
+  disabled: true
+
+- id: ui-goal
+  disabled: true
+
+- id: ui-trajectory
+  disabled: true
+
+- id: ui-session-panel
+  disabled: true
+
+# 工作流运行卡:不写代码的用户看不到这些。
+- id: ui-workflow-run
+  disabled: true
+
+# 右侧栏的终端、文件树、浏览器:工作台有自己的文章管理页。
+- id: ui-sidebar-terminal
+  disabled: true
+
+- id: ui-sidebar-files
+  disabled: true
+
+- id: ui-sidebar-browser
+  disabled: true
+
+# 账号通知、会话日志上传。
+- id: ui-account-notifications
+  disabled: true
+
+- id: ui-settings-session-log
+  disabled: true
+
+# 推荐卡(动作卡、创作推荐、插件推荐)。
+- id: client-ui-action-cards
+  disabled: true
+
+- id: client-ui-creation-recommendations
+  disabled: true
+
+- id: client-ui-plugin-recommendations
+  disabled: true
+
+# =================================================================
+# 刻意保留的入口(附理由,避免以后被误删)
+# =================================================================
+# ui-message-feedback  —— 文章质量反馈是产品迭代的数据源
+# ui-secret-mask       —— 凭据遮罩,防止密钥明文落进会话日志
+# ui-reference         —— @ 引用素材
+# ui-file-drag         —— 拖素材进聊天
+# ui-permission        —— 权限预设(agent 要写文件)
+# ui-approval          —— 审批卡
+# ui-agent-preset      —— 模式切换(写作模式要挂在这里)
+# ui-model-selection   —— 换模型
+# ui-settings-models   —— 多模型 / Key 配置
+# ui-attachment        —— 素材上传
+# ui-input-trigger     —— / 与 @ 触发
+# ui-commands          —— 命令弹层
+# ui-plan              —— 计划模式。standard preset 的 planning 组会让 agent 受计划纪律约束;
+#                         关掉这个 UI 会让用户看不到模式状态与审阅卡,体验割裂
+# ui-skill             —— 技能
+# ui-tool              —— 工具调用视图(透明度:让用户知道 agent 读了什么)
+# ui-deliverables      —— 回合尾交付物卡。standard preset 有 present 工具,
+#                         关掉它用户就看不到 agent 交付的文件
+# ui-brand-official    —— 品牌层(自有品牌包就绪后替换)
+# remote-connection    —— 手机扫码连本机(移动端要用)
+# product-analytics    —— 遥测(商业化后应换成自有端点)
+# schedule(宿主)       —— 见上方说明:tool-schedule 依赖它
