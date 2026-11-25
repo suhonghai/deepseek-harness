@@ -3,29 +3,29 @@
 # After editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write packages/experimental/workbench/README.md
 /:
-  en: b830b91f8381e177
-  zh: f8a1d475858b6a6b
+  en: 1f71b51cde12a646
+  zh: ffbe2e659604589b
 /deepseek-ai-dsh-workbench:
   en: 31b3087ac63128c6
   zh: f46c83343e4e383e
 /deepseek-ai-dsh-workbench/summary:
-  en: 1c89e3956dd6394e
-  zh: 107891d658638e08
+  en: ffffdf963ee9e7ef
+  zh: d7ef0817f8097130
 /deepseek-ai-dsh-workbench/table-of-contents:
   en: 07f3642294ee905d
   zh: 18d9360e32410594
 /deepseek-ai-dsh-workbench/use-this-package:
-  en: 51b161d7ca558827
-  zh: 78895600eb9a837c
+  en: aeed4f0d8d0f09c1
+  zh: fc59f61abb99b1f8
 /deepseek-ai-dsh-workbench/understand-the-implementation:
-  en: 48007aba02be698c
-  zh: e5d1c817dda18514
+  en: acd0cb8d48baa2fc
+  zh: 1736f90fc08f3016
 /deepseek-ai-dsh-workbench/further-exploration:
-  en: 304ade65b68cf8e3
-  zh: 1e1b8c6c2512850f
+  en: ba4684d902598baa
+  zh: 266cb63ef5f4951b
 /deepseek-ai-dsh-workbench/dev-note:
-  en: 48f03d975792a334
-  zh: ce6034f0b670e072
+  en: efa949367e2c8997
+  zh: 765d0ec31ee419ac
 /deepseek-ai-dsh-workbench/model-experience:
   en: 215e7ba838619b7b
   zh: a311da3843709f90
@@ -33,14 +33,41 @@
   en: cd8bafa94319b537
   zh: fa2ba53acc5bf0b6
 /deepseek-ai-dsh-workbench/model-experience/workbench-panel/what-the-model-sees:
-  en: d3a9cff3bdaa6590
-  zh: d0a4ecac2e51f507
+  en: 517c333d9ad3f0ca
+  zh: 4874f8e6a6a9eca7
 /deepseek-ai-dsh-workbench/model-experience/workbench-panel/token-effect:
-  en: d7e1c5286d34b4e2
-  zh: 1615666d41c54bc1
+  en: ddc4142d023b0799
+  zh: 13f8bf3c8f4365fc
 /deepseek-ai-dsh-workbench/model-experience/workbench-panel/kv-cache-effect:
-  en: d0d1aaeacaa7ad7b
-  zh: 19bd9692a2b7cc47
+  en: 52776f85186ccf42
+  zh: 42ad22a99c6f7f5d
+/deepseek-ai-dsh-workbench/model-experience/prompt-draft:
+  en: 186b19b274f99b0c
+  zh: 8119142c17f3eccc
+/deepseek-ai-dsh-workbench/model-experience/prompt-draft/what-the-model-sees:
+  en: 1197557f97e17bfa
+  zh: da0765cb152c6036
+/deepseek-ai-dsh-workbench/model-experience/prompt-draft/what-the-model-sees/the-prompt-section-s-shape:
+  en: 5ffe5f5af46a36cf
+  zh: 58c9a8904d8b14b1
+/deepseek-ai-dsh-workbench/model-experience/prompt-draft/token-effect:
+  en: c3c6bc302129e91e
+  zh: 2af99634104ef71d
+/deepseek-ai-dsh-workbench/model-experience/prompt-draft/kv-cache-effect:
+  en: 7ffb091a90f2332b
+  zh: e33c52da8027e832
+/deepseek-ai-dsh-workbench/model-experience/draft-tools:
+  en: f451499066557dae
+  zh: fb1609dd869d9f5a
+/deepseek-ai-dsh-workbench/model-experience/draft-tools/what-the-model-sees:
+  en: 90424906e5a6779c
+  zh: 452a8ea66ada7d72
+/deepseek-ai-dsh-workbench/model-experience/draft-tools/token-effect:
+  en: 7d2958296ff23b47
+  zh: 9179e5a1a8f8914f
+/deepseek-ai-dsh-workbench/model-experience/draft-tools/kv-cache-effect:
+  en: 8f9fe913c6e700ab
+  zh: aa42dace3df5a0c3
 /deepseek-ai-dsh-workbench/known-limitations-and-deferred-work:
-  en: 8f34db7cec0a6b81
-  zh: 7b760620f64bfa17
+  en: 8ca7d30518a20178
+  zh: 749f4d2a105d8c76

@@ -4295,7 +4295,7 @@ export interface Config {
 ## `@deepseek-ai/dsh-system-prompt`
 
 - `inject`: `sessionProjections`
-- `source`: [`packages/core/system-prompt/src/index.ts:316`](../packages/core/system-prompt/src/index.ts)
+- `source`: [`packages/core/system-prompt/src/index.ts:317`](../packages/core/system-prompt/src/index.ts)
 
 ```ts config-catalog
 /** Plugin config: the deployment-authored fragment of the system prompt (see {@link Config.personaPrefix} for its contract). */
@@ -5716,7 +5716,7 @@ export interface Config {
 | `@deepseek-ai/dsh-tools` | `systemPrompt` | [`packages/core/tools/src/index.ts`](../packages/core/tools/src/index.ts) |
 | `@deepseek-ai/dsh-user-questions` | — | [`packages/interaction/user-questions/src/index.ts`](../packages/interaction/user-questions/src/index.ts) |
 | `@deepseek-ai/dsh-webhook` | `agents` · `agentDefaultModel` · `agentPresets` · `permissionPresets` · `sessionTitle` · `workspaceRegistry` | [`packages/experimental/webhook/src/index.ts`](../packages/experimental/webhook/src/index.ts) |
-| `@deepseek-ai/dsh-workbench` | — | [`packages/experimental/workbench/src/index.ts`](../packages/experimental/workbench/src/index.ts) |
+| `@deepseek-ai/dsh-workbench` | `agents` · `sessionProjections` · `tools` · `systemPrompt` · `commands` | [`packages/experimental/workbench/src/index.ts`](../packages/experimental/workbench/src/index.ts) |
 | `@deepseek-ai/dsh-workspace` | `storageDomain` · `sessionPersistence` | [`packages/workspace/workspace/src/index.ts`](../packages/workspace/workspace/src/index.ts) |
 <!-- END GENERATED config-catalog:no-config -->
 

@@ -1,0 +1,23 @@
+{
+  "formatVersion": 2,
+  "roots": [
+    {"key":"event:prompt-draft/change","kind":"event","event":"prompt-draft/change","surface":false,"digest":"feffe9b40e3fe94bd0aacfb4dbd998e9f96d8b6cb022f9926e28d635eacd59c4"}
+  ],
+  "types": [],
+  "nodes": {
+    "0657d3ca5ac4e7bf": {"kind":"primitive","type":"number"},
+    "0b6d718c693fdf7f": {"kind":"object","properties":[{"name":"id","type":"4cd48f3e5108bd6e","optional":false},{"name":"revision","type":"0657d3ca5ac4e7bf","optional":false}],"indices":[]},
+    "324f377536bcc0a3": {"kind":"object","properties":[{"name":"cleared","type":"0b6d718c693fdf7f","optional":false},{"name":"clearedAt","type":"0657d3ca5ac4e7bf","optional":false},{"name":"kind","type":"8847c477a38a044b","optional":false},{"name":"operation","type":"e7e154d47d5fbc53","optional":false},{"name":"version","type":"f88f1b7b6bb733f6","optional":false}],"indices":[]},
+    "437fcc4075035cbc": {"kind":"object","properties":[{"name":"body","type":"4cd48f3e5108bd6e","optional":true},{"name":"draft","type":"4cd48f3e5108bd6e","optional":false},{"name":"kind","type":"8847c477a38a044b","optional":false},{"name":"operation","type":"c66c561db80e334d","optional":false},{"name":"parentRevision","type":"0657d3ca5ac4e7bf","optional":false},{"name":"revision","type":"0657d3ca5ac4e7bf","optional":false},{"name":"title","type":"4cd48f3e5108bd6e","optional":true},{"name":"updatedAt","type":"0657d3ca5ac4e7bf","optional":false},{"name":"version","type":"f88f1b7b6bb733f6","optional":false}],"indices":[]},
+    "4cd48f3e5108bd6e": {"kind":"primitive","type":"string"},
+    "7624ca28c61ca0ea": {"kind":"literal","value":"create"},
+    "8847c477a38a044b": {"kind":"literal","value":"prompt-draft/change"},
+    "8fd24f0618c9e6cf": {"kind":"object","properties":[{"name":"body","type":"4cd48f3e5108bd6e","optional":false},{"name":"createdAt","type":"0657d3ca5ac4e7bf","optional":false},{"name":"draft","type":"4cd48f3e5108bd6e","optional":false},{"name":"kind","type":"8847c477a38a044b","optional":false},{"name":"operation","type":"7624ca28c61ca0ea","optional":false},{"name":"revision","type":"0657d3ca5ac4e7bf","optional":false},{"name":"title","type":"4cd48f3e5108bd6e","optional":false},{"name":"updatedAt","type":"0657d3ca5ac4e7bf","optional":false},{"name":"version","type":"f88f1b7b6bb733f6","optional":false}],"indices":[]},
+    "c66c561db80e334d": {"kind":"literal","value":"update"},
+    "c92cfb62911c9521": {"kind":"union","types":["324f377536bcc0a3","437fcc4075035cbc","8fd24f0618c9e6cf"]},
+    "dacf3d5f3e4ff619": {"kind":"literal","value":true},
+    "e7e154d47d5fbc53": {"kind":"literal","value":"clear"},
+    "f88f1b7b6bb733f6": {"kind":"literal","value":1},
+    "feffe9b40e3fe94b": {"kind":"object","properties":[{"name":"data","type":"c92cfb62911c9521","optional":false},{"name":"ignorable","type":"dacf3d5f3e4ff619","optional":true},{"name":"seq","type":"0657d3ca5ac4e7bf","optional":false},{"name":"time","type":"0657d3ca5ac4e7bf","optional":false},{"name":"type","type":"8847c477a38a044b","optional":false}],"indices":[]}
+  }
+}

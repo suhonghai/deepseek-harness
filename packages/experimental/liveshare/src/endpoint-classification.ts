@@ -65,6 +65,10 @@ export const VIEWER_ENDPOINT_CLASSES = {
   'goals/create': 'reader-session-read', // the page creates a goal on a visible Session
   'goals/pause': 'reader-session-read', // the page pauses the goal of a visible Session
   'goals/resume': 'reader-session-read', // the page resumes the goal of a visible Session
+  'promptDrafts/get': 'reader-session-read', // the page reads the prompt draft of a visible Session
+  'promptDrafts/create': 'reader-session-read', // the page creates the prompt draft of a visible Session
+  'promptDrafts/update': 'reader-session-read', // the page edits the prompt draft of a visible Session
+  'promptDrafts/clear': 'reader-session-read', // the page clears the prompt draft of a visible Session
   'job/list': 'reader-session-read', // the page lists the background jobs of a visible Session
   'job/follow': 'reader-session-read', // the page follows one background job of a visible Session
   'sessionReferenceResolver/candidates': 'reader-session-read', // the page lists sessions for an @ reference

@@ -54,6 +54,7 @@
 | `event:model/selection` | event | `35203ba7ad5ef6f97d556b85df20ae98f04f09c65748cecdf8eefdb8b6405ffc` | [`{ type: "model/selection" }`](#persistence-type-sha256-35203ba7ad5ef6f97d556b85df20ae98f04f09c65748cecdf8eefdb8b6405ffc) |
 | `event:permission/preset` | event | `5c45bf4c544a7211dcd8ba6ba7e5f1bc39b49e7a9df9d5cbdc8e87c22771b37b` | [`{ type: "permission/preset" }`](#persistence-type-sha256-5c45bf4c544a7211dcd8ba6ba7e5f1bc39b49e7a9df9d5cbdc8e87c22771b37b) |
 | `event:plan/mode` | event | `a7cf43ce7c2a4c038feed1885cd7a00d5c6ee2d90a7e0d56b46f78a3e1ca327f` | [`{ type: "plan/mode" }`](#persistence-type-sha256-a7cf43ce7c2a4c038feed1885cd7a00d5c6ee2d90a7e0d56b46f78a3e1ca327f) |
+| `event:prompt-draft/change` | event | `feffe9b40e3fe94bd0aacfb4dbd998e9f96d8b6cb022f9926e28d635eacd59c4` | [`{ type: "prompt-draft/change" }`](#persistence-type-sha256-feffe9b40e3fe94bd0aacfb4dbd998e9f96d8b6cb022f9926e28d635eacd59c4) |
 | `event:request/context` | event | `37cbc9cf06d494cfe5c67f078af1605eacb8e4c2c853e9e26455b73de0ee7ccf` | [`{ type: "request/context" }`](#persistence-type-sha256-37cbc9cf06d494cfe5c67f078af1605eacb8e4c2c853e9e26455b73de0ee7ccf) |
 | `event:request/header` | event | `4208123b50df5006b181481ab45fcf1cde807b88d3fd4d340090bc2e202fac41` | [`{ type: "request/header" }`](#persistence-type-sha256-4208123b50df5006b181481ab45fcf1cde807b88d3fd4d340090bc2e202fac41) |
 | `event:sandbox/mode` | event | `516da4cdd6d2f1e5ce488e648578ca51f40e458f707b803e5b24de870e799415` | [`{ type: "sandbox/mode" }`](#persistence-type-sha256-516da4cdd6d2f1e5ce488e648578ca51f40e458f707b803e5b24de870e799415) |
@@ -753,6 +754,22 @@ export type SessionEvent<T extends SessionEventType = SessionEventType> = {
 ```
 
 来源：[`packages/plan/plan-mode/src/index.ts:55`](../packages/plan/plan-mode/src/index.ts)
+
+### `prompt-draft/*`
+
+<a id="prompt-draftchange--log-only"></a>
+
+#### `prompt-draft/change` — log-only
+
+```ts persistence-catalog
+/**
+ * One durable prompt-draft mutation: a create with its initial content,
+ * an update with only the changed content, or a clear tombstone.
+ */
+'prompt-draft/change': DraftChangeMeta
+```
+
+来源：[`packages/experimental/workbench/src/host/draft-domain.ts:77`](../packages/experimental/workbench/src/host/draft-domain.ts)
 
 ### `request/*`
 
@@ -2369,6 +2386,14 @@ SHA-256: `0341d4c3dfcd53253cdc1e789d9130d3cd848b6f8b0706bf92f313a68b39ff23`
 
 `"product-interaction"`
 
+<a id="persistence-type-sha256-8847c477a38a044b7bed1954de6c6f1b0187d133d842b14bc3c53e7f53ea81d1"></a>
+
+### `"prompt-draft/change"`
+
+SHA-256: `8847c477a38a044b7bed1954de6c6f1b0187d133d842b14bc3c53e7f53ea81d1`
+
+`"prompt-draft/change"`
+
 <a id="persistence-type-sha256-e31572180d6b28b73f073ad30ae19d5d82982d3daf984723984e23da1e7c459a"></a>
 
 ### `"provider"`
@@ -3065,6 +3090,14 @@ SHA-256: `05a2796621b1ee6c03ef7abe560b25116bb4da4d592312117242a78415a32b04`
 
 `"unknown"`
 
+<a id="persistence-type-sha256-c66c561db80e334d620372be95d2d893fe5931645317d6c961e001ae124faac4"></a>
+
+### `"update"`
+
+SHA-256: `c66c561db80e334d620372be95d2d893fe5931645317d6c961e001ae124faac4`
+
+`"update"`
+
 <a id="persistence-type-sha256-0bdaf9cb63594be4ef034b68901fffe792fe09d6d5f6bac42d7f56f6e7834fb9"></a>
 
 ### `"usage"`
@@ -3575,6 +3608,113 @@ SHA-256: `14e81f18050da9ee77f4bbe28812bb08fcb3e9031dde06720459ffafb7305502`
 
 仅表示归属的新增 kind：`action-cards`, `tmux-context`, `user-question-reply`, `working-directory`.
 
+<a id="persistence-type-sha256-c92cfb62911c9521a2be53421fd687aa0109779e33f8b96bd35a2bdb0450c77f"></a>
+
+<a id="persistence-type-draftchangemeta"></a>
+
+<a id="persistence-type-packagesexperimentalworkbenchsrchostdraft-domaintsdraftchangemeta"></a>
+
+### `DraftChangeMeta`
+
+SHA-256: `c92cfb62911c9521a2be53421fd687aa0109779e33f8b96bd35a2bdb0450c77f`
+
+来源：[`packages/experimental/workbench/src/host/draft-domain.ts:69`](../packages/experimental/workbench/src/host/draft-domain.ts)
+
+| kind | form 属性 | 其他必需字段 | 完整定义 |
+|---|---|---|---|
+| `prompt-draft/change` | 未声明 | `cleared`: [`DraftRef`](#persistence-type-sha256-0b6d718c693fdf7f06dcccb0bcbbabe78cc63514eafc62d6b2a3899735279d6f); `clearedAt`: `number`; `operation`: `"clear"`; `version`: `1` | [`DraftClearChangeMeta`](#persistence-type-sha256-324f377536bcc0a3e3fea94034cb1bbf6c83ac4f7a92a2de668c70016ed1460d) |
+| `prompt-draft/change` | 未声明 | `draft`: `string`; `operation`: `"update"`; `parentRevision`: `number`; `revision`: `number`; `updatedAt`: `number`; `version`: `1` | [`DraftUpdateChangeMeta`](#persistence-type-sha256-437fcc4075035cbc3a0ecd8c35b461fdedaeffa9bd8ead49bd9ce03e26996391) |
+| `prompt-draft/change` | 未声明 | `body`: `string`; `createdAt`: `number`; `draft`: `string`; `operation`: `"create"`; `revision`: `number`; `title`: `string`; `updatedAt`: `number`; `version`: `1` | [`DraftCreateChangeMeta`](#persistence-type-sha256-8fd24f0618c9e6cf1ce2e344ebe87148c08b5eb701f387da0df2bc187a75d2b2) |
+
+<a id="persistence-type-sha256-324f377536bcc0a3e3fea94034cb1bbf6c83ac4f7a92a2de668c70016ed1460d"></a>
+
+<a id="persistence-type-draftclearchangemeta"></a>
+
+<a id="persistence-type-packagesexperimentalworkbenchsrchostdraft-domaintsdraftclearchangemeta"></a>
+
+### `DraftClearChangeMeta`
+
+SHA-256: `324f377536bcc0a3e3fea94034cb1bbf6c83ac4f7a92a2de668c70016ed1460d`
+
+来源：[`packages/experimental/workbench/src/host/draft-domain.ts:58`](../packages/experimental/workbench/src/host/draft-domain.ts)
+
+| 属性 | 存在性 | 类型 |
+|---|---|---|
+| `cleared` | 必需 | [`DraftRef`](#persistence-type-sha256-0b6d718c693fdf7f06dcccb0bcbbabe78cc63514eafc62d6b2a3899735279d6f) |
+| `clearedAt` | 必需 | `number` |
+| `kind` | 必需 | `"prompt-draft/change"` |
+| `operation` | 必需 | `"clear"` |
+| `version` | 必需 | `1` |
+
+<a id="persistence-type-sha256-8fd24f0618c9e6cf1ce2e344ebe87148c08b5eb701f387da0df2bc187a75d2b2"></a>
+
+<a id="persistence-type-draftcreatechangemeta"></a>
+
+<a id="persistence-type-packagesexperimentalworkbenchsrchostdraft-domaintsdraftcreatechangemeta"></a>
+
+### `DraftCreateChangeMeta`
+
+SHA-256: `8fd24f0618c9e6cf1ce2e344ebe87148c08b5eb701f387da0df2bc187a75d2b2`
+
+来源：[`packages/experimental/workbench/src/host/draft-domain.ts:16`](../packages/experimental/workbench/src/host/draft-domain.ts)
+
+| 属性 | 存在性 | 类型 |
+|---|---|---|
+| `body` | 必需 | `string` |
+| `createdAt` | 必需 | `number` |
+| `draft` | 必需 | `string` |
+| `kind` | 必需 | `"prompt-draft/change"` |
+| `operation` | 必需 | `"create"` |
+| `revision` | 必需 | `number` |
+| `title` | 必需 | `string` |
+| `updatedAt` | 必需 | `number` |
+| `version` | 必需 | `1` |
+
+<a id="persistence-type-sha256-0b6d718c693fdf7f06dcccb0bcbbabe78cc63514eafc62d6b2a3899735279d6f"></a>
+
+<a id="persistence-type-draftref"></a>
+
+<a id="persistence-type-goalref"></a>
+
+<a id="persistence-type-packagesexperimentalworkbenchsrchostdraft-typestsdraftref"></a>
+
+<a id="persistence-type-packagesgoalgoalsrctypestsgoalref"></a>
+
+### `DraftRef`
+
+SHA-256: `0b6d718c693fdf7f06dcccb0bcbbabe78cc63514eafc62d6b2a3899735279d6f`
+
+来源：[`packages/experimental/workbench/src/host/draft-types.ts:16`](../packages/experimental/workbench/src/host/draft-types.ts) · [`packages/goal/goal/src/types.ts:20`](../packages/goal/goal/src/types.ts)
+
+| 属性 | 存在性 | 类型 |
+|---|---|---|
+| `id` | 必需 | `string` |
+| `revision` | 必需 | `number` |
+
+<a id="persistence-type-sha256-437fcc4075035cbc3a0ecd8c35b461fdedaeffa9bd8ead49bd9ce03e26996391"></a>
+
+<a id="persistence-type-draftupdatechangemeta"></a>
+
+<a id="persistence-type-packagesexperimentalworkbenchsrchostdraft-domaintsdraftupdatechangemeta"></a>
+
+### `DraftUpdateChangeMeta`
+
+SHA-256: `437fcc4075035cbc3a0ecd8c35b461fdedaeffa9bd8ead49bd9ce03e26996391`
+
+来源：[`packages/experimental/workbench/src/host/draft-domain.ts:39`](../packages/experimental/workbench/src/host/draft-domain.ts)
+
+| 属性 | 存在性 | 类型 |
+|---|---|---|
+| `body` | 可选 | `string` |
+| `draft` | 必需 | `string` |
+| `kind` | 必需 | `"prompt-draft/change"` |
+| `operation` | 必需 | `"update"` |
+| `parentRevision` | 必需 | `number` |
+| `revision` | 必需 | `number` |
+| `title` | 可选 | `string` |
+| `updatedAt` | 必需 | `number` |
+| `version` | 必需 | `1` |
+
 <a id="persistence-type-sha256-9a930283b91d493d6347146f2475bb107294b379415ca02162354f46a64164f7"></a>
 
 <a id="persistence-type-epochheader"></a>
@@ -3717,7 +3857,7 @@ SHA-256: `7d226b9fd95b4ba213d4237c22e930a91c3c769c95ca7f92977b9d625ba13438`
 | kind | form 属性 | 其他必需字段 | 完整定义 |
 |---|---|---|---|
 | `goal/change` | 未声明 | `createdAt`: `number`; `goal`: [`GoalSnapshot`](#persistence-type-sha256-6bbe793f6a93dc8d50a4d4d3fbb6f8ed15650bcb7e151d28669628f7b7c3fc25); `operation`: [`union (6 variants)`](#persistence-type-sha256-62e6a429ff3f390a46ac39fb468692032f42936ca0db19b53454184189401379); `roundsStarted`: `number`; `updatedAt`: `number`; `version`: `1` | [`GoalSnapshotChangeMeta`](#persistence-type-sha256-1df34a6c086866ffdc2dd9e8e5c581c3751a010cdf6b8538a7327f7a3237f0b4) |
-| `goal/change` | 未声明 | `cleared`: [`GoalRef`](#persistence-type-sha256-0b6d718c693fdf7f06dcccb0bcbbabe78cc63514eafc62d6b2a3899735279d6f); `clearedAt`: `number`; `operation`: `"clear"`; `version`: `1` | [`GoalClearChangeMeta`](#persistence-type-sha256-cffcdc19881ab61ec0a9ce18743996f7ac44ac8889f34dfac36ae745574aa22f) |
+| `goal/change` | 未声明 | `cleared`: [`DraftRef`](#persistence-type-sha256-0b6d718c693fdf7f06dcccb0bcbbabe78cc63514eafc62d6b2a3899735279d6f); `clearedAt`: `number`; `operation`: `"clear"`; `version`: `1` | [`GoalClearChangeMeta`](#persistence-type-sha256-cffcdc19881ab61ec0a9ce18743996f7ac44ac8889f34dfac36ae745574aa22f) |
 
 <a id="persistence-type-sha256-cffcdc19881ab61ec0a9ce18743996f7ac44ac8889f34dfac36ae745574aa22f"></a>
 
@@ -3733,7 +3873,7 @@ SHA-256: `cffcdc19881ab61ec0a9ce18743996f7ac44ac8889f34dfac36ae745574aa22f`
 
 | 属性 | 存在性 | 类型 |
 |---|---|---|
-| `cleared` | 必需 | [`GoalRef`](#persistence-type-sha256-0b6d718c693fdf7f06dcccb0bcbbabe78cc63514eafc62d6b2a3899735279d6f) |
+| `cleared` | 必需 | [`DraftRef`](#persistence-type-sha256-0b6d718c693fdf7f06dcccb0bcbbabe78cc63514eafc62d6b2a3899735279d6f) |
 | `clearedAt` | 必需 | `number` |
 | `kind` | 必需 | `"goal/change"` |
 | `operation` | 必需 | `"clear"` |
@@ -3776,23 +3916,6 @@ SHA-256: `b8327af7ee5767952d1300cb4f03b7fc04197ae5ba275e13981c689ff7506172`
 - `"blocked"`
 - `"complete"`
 - `"paused"`
-
-<a id="persistence-type-sha256-0b6d718c693fdf7f06dcccb0bcbbabe78cc63514eafc62d6b2a3899735279d6f"></a>
-
-<a id="persistence-type-goalref"></a>
-
-<a id="persistence-type-packagesgoalgoalsrctypestsgoalref"></a>
-
-### `GoalRef`
-
-SHA-256: `0b6d718c693fdf7f06dcccb0bcbbabe78cc63514eafc62d6b2a3899735279d6f`
-
-来源：[`packages/goal/goal/src/types.ts:20`](../packages/goal/goal/src/types.ts)
-
-| 属性 | 存在性 | 类型 |
-|---|---|---|
-| `id` | 必需 | `string` |
-| `revision` | 必需 | `number` |
 
 <a id="persistence-type-sha256-6bbe793f6a93dc8d50a4d4d3fbb6f8ed15650bcb7e151d28669628f7b7c3fc25"></a>
 
@@ -5730,6 +5853,8 @@ SHA-256: `5d03ba38734809bcbd2a55221bd938b3b3fc34b49bb686c6113e9e4931e3aa78`
 
 <a id="persistence-type-compactionid"></a>
 
+<a id="persistence-type-draftid"></a>
+
 <a id="persistence-type-goalid"></a>
 
 <a id="persistence-type-jobid"></a>
@@ -5751,6 +5876,8 @@ SHA-256: `5d03ba38734809bcbd2a55221bd938b3b3fc34b49bb686c6113e9e4931e3aa78`
 <a id="persistence-type-packagesexperimentalwebhooksrcbrandtswebhookruleid"></a>
 
 <a id="persistence-type-packagesexperimentalwebhooksrcbrandtswebhooksourceid"></a>
+
+<a id="persistence-type-packagesexperimentalworkbenchsrchostdraft-typestsdraftid"></a>
 
 <a id="persistence-type-packagesfeedbackmessage-feedbacksrctypestsmessagefeedbackversion"></a>
 
@@ -5820,7 +5947,7 @@ SHA-256: `5d03ba38734809bcbd2a55221bd938b3b3fc34b49bb686c6113e9e4931e3aa78`
 
 SHA-256: `4cd48f3e5108bd6ebedf7301c3638839b8b2b9db8dbd493974177fbdeb91a01b`
 
-来源：[`packages/api/session-controller/src/types.ts:383`](../packages/api/session-controller/src/types.ts) · [`packages/attachment/attachment/src/brand.ts:6`](../packages/attachment/attachment/src/brand.ts) · [`packages/compaction/compaction/src/brand.ts:4`](../packages/compaction/compaction/src/brand.ts) · [`packages/core/session/src/types.ts:21`](../packages/core/session/src/types.ts) · [`packages/experimental/webhook/src/brand.ts:12`](../packages/experimental/webhook/src/brand.ts) · [`packages/experimental/webhook/src/brand.ts:6`](../packages/experimental/webhook/src/brand.ts) · [`packages/experimental/webhook/src/brand.ts:9`](../packages/experimental/webhook/src/brand.ts) · [`packages/feedback/message-feedback/src/types.ts:14`](../packages/feedback/message-feedback/src/types.ts) · [`packages/goal/goal/src/types.ts:17`](../packages/goal/goal/src/types.ts) · [`packages/interaction/action-cards/src/types.ts:12`](../packages/interaction/action-cards/src/types.ts) · [`packages/interaction/commands/src/brand.ts:22`](../packages/interaction/commands/src/brand.ts) · [`packages/interaction/user-approval/src/types.ts:17`](../packages/interaction/user-approval/src/types.ts) · [`packages/jobs/jobs/src/brand.ts:9`](../packages/jobs/jobs/src/brand.ts) · [`packages/llm/llm-retry/src/brand.ts:4`](../packages/llm/llm-retry/src/brand.ts) · [`packages/llm/llm/src/brand.ts:16`](../packages/llm/llm/src/brand.ts) · [`packages/llm/llm/src/brand.ts:31`](../packages/llm/llm/src/brand.ts) · [`packages/llm/llm/src/brand.ts:43`](../packages/llm/llm/src/brand.ts) · [`packages/llm/llm/src/brand.ts:67`](../packages/llm/llm/src/brand.ts) · [`packages/schedule/schedule/src/types.ts:14`](../packages/schedule/schedule/src/types.ts) · [`packages/session/session-title/src/types.ts:17`](../packages/session/session-title/src/types.ts) · [`packages/team/agent-team/src/types.ts:20`](../packages/team/agent-team/src/types.ts) · [`packages/team/agent-team/src/types.ts:32`](../packages/team/agent-team/src/types.ts) · [`packages/team/agent-team/src/types.ts:8`](../packages/team/agent-team/src/types.ts) · [`packages/workflow/workflow/src/types.ts:14`](../packages/workflow/workflow/src/types.ts)
+来源：[`packages/api/session-controller/src/types.ts:383`](../packages/api/session-controller/src/types.ts) · [`packages/attachment/attachment/src/brand.ts:6`](../packages/attachment/attachment/src/brand.ts) · [`packages/compaction/compaction/src/brand.ts:4`](../packages/compaction/compaction/src/brand.ts) · [`packages/core/session/src/types.ts:21`](../packages/core/session/src/types.ts) · [`packages/experimental/webhook/src/brand.ts:12`](../packages/experimental/webhook/src/brand.ts) · [`packages/experimental/webhook/src/brand.ts:6`](../packages/experimental/webhook/src/brand.ts) · [`packages/experimental/webhook/src/brand.ts:9`](../packages/experimental/webhook/src/brand.ts) · [`packages/experimental/workbench/src/host/draft-types.ts:13`](../packages/experimental/workbench/src/host/draft-types.ts) · [`packages/feedback/message-feedback/src/types.ts:14`](../packages/feedback/message-feedback/src/types.ts) · [`packages/goal/goal/src/types.ts:17`](../packages/goal/goal/src/types.ts) · [`packages/interaction/action-cards/src/types.ts:12`](../packages/interaction/action-cards/src/types.ts) · [`packages/interaction/commands/src/brand.ts:22`](../packages/interaction/commands/src/brand.ts) · [`packages/interaction/user-approval/src/types.ts:17`](../packages/interaction/user-approval/src/types.ts) · [`packages/jobs/jobs/src/brand.ts:9`](../packages/jobs/jobs/src/brand.ts) · [`packages/llm/llm-retry/src/brand.ts:4`](../packages/llm/llm-retry/src/brand.ts) · [`packages/llm/llm/src/brand.ts:16`](../packages/llm/llm/src/brand.ts) · [`packages/llm/llm/src/brand.ts:31`](../packages/llm/llm/src/brand.ts) · [`packages/llm/llm/src/brand.ts:43`](../packages/llm/llm/src/brand.ts) · [`packages/llm/llm/src/brand.ts:67`](../packages/llm/llm/src/brand.ts) · [`packages/schedule/schedule/src/types.ts:14`](../packages/schedule/schedule/src/types.ts) · [`packages/session/session-title/src/types.ts:17`](../packages/session/session-title/src/types.ts) · [`packages/team/agent-team/src/types.ts:20`](../packages/team/agent-team/src/types.ts) · [`packages/team/agent-team/src/types.ts:32`](../packages/team/agent-team/src/types.ts) · [`packages/team/agent-team/src/types.ts:8`](../packages/team/agent-team/src/types.ts) · [`packages/workflow/workflow/src/types.ts:14`](../packages/workflow/workflow/src/types.ts)
 
 `string`
 
@@ -8999,6 +9126,22 @@ SHA-256: `a7cf43ce7c2a4c038feed1885cd7a00d5c6ee2d90a7e0d56b46f78a3e1ca327f`
 | `seq` | 必需 | `number` |
 | `time` | 必需 | `number` |
 | `type` | 必需 | `"plan/mode"` |
+
+<a id="persistence-type-sha256-feffe9b40e3fe94bd0aacfb4dbd998e9f96d8b6cb022f9926e28d635eacd59c4"></a>
+
+<a id="persistence-type-eventprompt-draftchange"></a>
+
+### `{ type: "prompt-draft/change" }`
+
+SHA-256: `feffe9b40e3fe94bd0aacfb4dbd998e9f96d8b6cb022f9926e28d635eacd59c4`
+
+| 属性 | 存在性 | 类型 |
+|---|---|---|
+| `data` | 必需 | [`DraftChangeMeta`](#persistence-type-sha256-c92cfb62911c9521a2be53421fd687aa0109779e33f8b96bd35a2bdb0450c77f) |
+| `ignorable` | 可选 | `true` |
+| `seq` | 必需 | `number` |
+| `time` | 必需 | `number` |
+| `type` | 必需 | `"prompt-draft/change"` |
 
 <a id="persistence-type-sha256-71bb3254ec8f1e491ce63b762a7b5f18709de23aa4e8abcc8b886f4b6ce051dd"></a>
 

@@ -1,0 +1,28 @@
+# Bilingual-pair consistency record for 2026-11-25-prompt-draft-event.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write docs/persistence-changes/2026-11-25-prompt-draft-event.md
+/:
+  en: 3d5a424ae7d7e46b
+  zh: c22a8e4a62d8cc1a
+/2026-11-25-prompt-draft-event:
+  en: 8296077518306793
+  zh: 54a71dcc372d8cae
+/2026-11-25-prompt-draft-event/summary:
+  en: f8eeeed9a6e5c14c
+  zh: ee77e921a8e75650
+/2026-11-25-prompt-draft-event/table-of-contents:
+  en: 6cf314a069ceb451
+  zh: 9adff678e9ecab3b
+/2026-11-25-prompt-draft-event/declaration:
+  en: 6907136f28e48c90
+  zh: 02f8298485f3d8e7
+/2026-11-25-prompt-draft-event/compatibility:
+  en: 442785413487b267
+  zh: d098da4d1242c5ff
+/2026-11-25-prompt-draft-event/verification:
+  en: 2478308090bec548
+  zh: 2bc09553bcd2ad65
+/2026-11-25-prompt-draft-event/dev-note:
+  en: b75c8458928b72b9
+  zh: 003ba4e17b4b5269

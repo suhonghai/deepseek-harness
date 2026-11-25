@@ -107,10 +107,14 @@
 # ------------------------------------------------ 与内容创作无关的能力
 # 定时任务:自媒体场景不需要定时触发。
 #
-# 只关客户端 UI,保留宿主 `schedule` service —— standard preset 里有 tool-schedule,
-# 它直接调 ctx.schedule.deliveryLimits();宿主 service 一旦禁用,agent 调用该工具会崩。
-# 要彻底移除定时能力,得在自有 preset 里去掉 tool-schedule 行,才能一并关掉宿主 schedule。
+# 客户端 UI 与宿主 service 一起关。顺序有讲究:工作台 preset 不含 tool-schedule 行,
+# 所以宿主 schedule service 已经没有 model 侧消费者;若 preset 还留着 tool-schedule,
+# 那行会永远停在 pending,preset 会被标成 broken。
 - id: ui-schedule
+  disabled: true
+
+# 宿主面的定时服务。工作台 preset 不含 tool-schedule,所以这里没有 model 侧消费者。
+- id: schedule
   disabled: true
 
 # 子 Agent / Agent 团队:初期隐藏,普通用户理解成本高。
@@ -189,4 +193,31 @@
 # ui-brand-official    —— 品牌层(自有品牌包就绪后替换)
 # remote-connection    —— 手机扫码连本机(移动端要用)
 # product-analytics    —— 遥测(商业化后应换成自有端点)
-# schedule(宿主)       —— 见上方说明:tool-schedule 依赖它
+# schedule(宿主)       —— 见上方说明:工作台 preset 已不含 tool-schedule,它暂时没有消费者
+
+# =================================================================
+# 只留工作台模式
+# =================================================================
+# 模式菜单没有过滤机制:客户端读的是全部已注册 preset,唯一办法是不注册。
+# 这四个是内置 preset 的声明行,关掉后 roster 里只剩工作台模式。
+- id: preset-standard
+  disabled: true
+
+- id: preset-ptc
+  disabled: true
+
+- id: preset-minimal
+  disabled: true
+
+- id: preset-cordis
+  disabled: true
+
+# 默认模式改成工作台。不改这一条,resolve() 会抛 agent-preset/not-found,新会话起不来。
+#
+# selectedDefault 必须一起写死:它是客户端在模式切换器里写下的 volatile 设置,
+# 同样持久化在这个 patch 里,而 defaultId = selectedDefault ?? default —— 一个
+# 指向已禁用 preset 的陈旧 selectedDefault 会遮蔽 default,让新会话起不来。
+- id: agent-preset-registry
+  config:
+    default: workbench
+    selectedDefault: workbench
