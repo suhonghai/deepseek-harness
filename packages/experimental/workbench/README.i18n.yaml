@@ -9,17 +9,17 @@
   en: 31b3087ac63128c6
   zh: f46c83343e4e383e
 /deepseek-ai-dsh-workbench/summary:
-  en: ffffdf963ee9e7ef
-  zh: d7ef0817f8097130
+  en: 6ae10c36cdfba828
+  zh: 02a32c105b04f568
 /deepseek-ai-dsh-workbench/table-of-contents:
   en: 07f3642294ee905d
   zh: 18d9360e32410594
 /deepseek-ai-dsh-workbench/use-this-package:
-  en: aeed4f0d8d0f09c1
-  zh: fc59f61abb99b1f8
+  en: 62e111b471a45da6
+  zh: d5c0367ae827898b
 /deepseek-ai-dsh-workbench/understand-the-implementation:
-  en: acd0cb8d48baa2fc
-  zh: 1736f90fc08f3016
+  en: 8306f065234ee288
+  zh: 2df3bee37ba0a9e9
 /deepseek-ai-dsh-workbench/further-exploration:
   en: ba4684d902598baa
   zh: 266cb63ef5f4951b
@@ -67,7 +67,19 @@
   zh: 9179e5a1a8f8914f
 /deepseek-ai-dsh-workbench/model-experience/draft-tools/kv-cache-effect:
   en: 8f9fe913c6e700ab
-  zh: aa42dace3df5a0c3
+  zh: 1e8062a1f43ca807
+/deepseek-ai-dsh-workbench/model-experience/article-library-tools:
+  en: b88916cc432a6944
+  zh: 97b6ddb33466d9ae
+/deepseek-ai-dsh-workbench/model-experience/article-library-tools/what-the-model-sees:
+  en: b66c38ce655a583d
+  zh: 0db8084aaa1bab08
+/deepseek-ai-dsh-workbench/model-experience/article-library-tools/token-effect:
+  en: bd6e9f2753788815
+  zh: 7a11a532d3ba3342
+/deepseek-ai-dsh-workbench/model-experience/article-library-tools/kv-cache-effect:
+  en: 4b0e4fd0f1131f9a
+  zh: e735bdeaa46fb5e0
 /deepseek-ai-dsh-workbench/known-limitations-and-deferred-work:
-  en: 8ca7d30518a20178
-  zh: 749f4d2a105d8c76
+  en: 422ce257e4c063b9
+  zh: d99b213e444bb2f0

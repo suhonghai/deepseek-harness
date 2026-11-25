@@ -9,7 +9,7 @@ English | [中文](README.zh.md)
 
 ## Summary
 
-A publishing workbench bundle for the Web client. It contributes one global panel — the workbench a creator works in — and the four surfaces that product is made of: the generation prompt the agent refines with the author, the article library, the asset library, and the publishing queue. The panel is the frame those surfaces live in; the generation prompt surface is real, the other three are placeholders.
+A publishing workbench bundle for the Web client. It contributes one global panel — the workbench a creator works in — and the four surfaces that product is made of: the generation prompt the agent refines with the author, the article library, the asset library, and the publishing queue. The generation prompt and article library are wired to real data; the other two are placeholders.
 
 The prompt draft is the bundle's host capability. It is one draft per session, persisted in the session log, with a revision the model and the user compare against each other.
 
@@ -27,7 +27,7 @@ The prompt draft is the bundle's host capability. It is one draft per session, p
 <a id="use-this-package"></a>
 ## Use this package
 
-The bundle contributes one global panel to the Web client. The sidebar gains a Workbench entry; choosing it swaps the main area over to the workbench panel, and choosing the conversation entry returns to the chat. The panel lists the four surfaces the product is made of: the generation prompt, articles, assets, and publishing. Each surface renders its title and a one-line purpose; the generation prompt surface is the only one whose content is wired, and the other three still render a "not built yet" badge.
+The bundle contributes one global panel to the Web client. The sidebar gains a Workbench entry; choosing it swaps the main area over to the workbench panel, and choosing the conversation entry returns to the chat. The panel lists the four surfaces the product is made of: the generation prompt, articles, assets, and publishing. The generation-prompt section shows the most recently updated draft's body, revision, and a "continue in chat" button that returns to the Session that produced it; the articles section reads the library and lists stored pieces newest-first across draft / ready / published states. Assets and publishing still render a "not built yet" badge.
 
 The prompt draft works the way the product needs it to. You talk to the agent and you both edit one article-generation prompt. The draft is a session-scoped state: the agent reads it with `get_prompt_draft` and rewrites it with `update_prompt_draft`, and you read it with the `/draft` command — `/draft` on its own shows the current text, `/draft <text>` replaces the body, and `/draft clear` empties it. Every revision carries a number, and the bundle keeps the superseded revisions so you can see how the prompt got to where it is.
 
@@ -40,9 +40,11 @@ Installing the bundle is what puts the panel on screen and the draft in the sess
 <a id="understand-the-implementation"></a>
 ## Understand the implementation
 
-The package has two faces. The host face (`src/index.ts`) mounts the prompt-draft domain, its two model tools, and the `/draft` command. The browser face (`src/client/`) registers the panel on the `main` keyed slot of the layout service and the sidebar entry on the `sidebar.panellist` list slot, the same two slots the shipped Plugins page uses. The sidebar owns the button, the label, and the selected state; the panel contributes content only.
+The package has two faces. The host face (`src/index.ts`) mounts the article library, the prompt-draft domain, their model tools, and the `/draft` command. The browser face (`src/client/`) registers the panel on the `main` keyed slot of the layout service and the sidebar entry on the `sidebar.panellist` list slot, the same two slots the shipped Plugins page uses. The sidebar owns the button, the label, and the selected state; the panel contributes content only. The browser face mounts this package's `remote` contract in `apply`, gains the `articles` Remote namespace, and tears the Remote down symmetrically with the UI.
 
-The host face is split into one file per concern under `src/host/`. `draft-types.ts` holds the pure types and the `promptDraft` projection-key declaration, free of host imports so the browser half can project the same content. `draft-domain.ts` holds the durable change payloads and the `prompt-draft/change` session event. `draft-fold.ts` is the pure replay fold and its strict decoder. `draft-runtime.ts` holds the error codes and the change version. `draft-service.ts` owns the `ctx.promptDrafts` service, and `draft-tools.ts` and `draft-command.ts` own the model-facing and human-facing surfaces.
+The host face is split into one file per concern under `src/host/`. `article-domain.ts` holds the domain declaration, record schema, and Remote boundary types; `article-service.ts` owns `ctx.articles` (over the base bundle's storage-domain / json backend); `article-tools.ts` owns the model-facing `list_articles` / `get_article`. `types.ts` aggregates both domains' pure types and is the package's `./types` subpath. `draft-types.ts` holds the pure types and the `promptDraft` projection-key declaration, free of host imports so the browser half can project the same content. `draft-domain.ts` holds the durable change payloads and the `prompt-draft/change` session event. `draft-fold.ts` is the pure replay fold and its strict decoder. `draft-runtime.ts` holds the error codes and the change version. `draft-service.ts` owns the `ctx.promptDrafts` service, and `draft-tools.ts` and `draft-command.ts` own the model-facing and human-facing surfaces.
+
+The panel reads from two sources: drafts come from the `promptDraft` session projection (pushed live over the Control Stream, read across every Session through the global `useSessions` hook and picking the most recently updated one), and articles come from the `articles` Remote (`articles-store.ts` reads once on mount and again on connection reset). The panel is global and bound to no single Session.
 
 The domain is event-sourced. One session event, `prompt-draft/change`, records every mutation: a create carries the initial content, an update carries only the content that changed together with the revision it advances from and the revision it produces, and a clear carries a tombstone. The session projection composes those events into the current whole draft and the retained revision history. Because an update carries only what changed, a title-only edit does not copy the body into the log again.
 
@@ -125,9 +127,23 @@ Two tool definitions on every request, plus one compact JSON result per call.
 
 Prefix-stable while the tool definitions are unchanged. Calls and results append after the reusable request prefix without invalidating earlier entries.
 
+### Article library tools
+
+#### What the model sees
+
+Two read tools over the durable library: `list_articles` returns the stored article ids, titles, states, update times, and a short body excerpt (optionally filtered by state), and `get_article` reads one full body by id. The library itself is not injected into the prompt; only what these tools return is model-visible. A prompt section at order 2460 tells the model the library exists.
+
+#### Token effect
+
+Two additional tool definitions on every request, plus one JSON result per call. Stored article bodies enter a request only when a `get_article` result is present, so the cost tracks what the model actually reads, not the size of the library.
+
+#### KV Cache effect
+
+Tool definitions are stable, so the request prefix up to them is reusable. The article-library guidance section sits at 2460; calls and their results append after the reusable prefix without invalidating earlier entries.
+
 ## Known Limitations and Deferred Work
 
-- The article list, the asset library, and the publishing queue are still placeholders. Only the generation prompt surface is wired to real data.
-- The browser panel does not yet read the draft. The domain publishes its state through the `promptDraft` session projection and the `promptDrafts` Remote, so the client has both channels; the panel does not use them yet.
-- The panel does not yet reach the article data. Whether that data lives in the Harness session store or in the product's own database is still open.
-- The draft is one per session. A second draft would need a selection rule that this release does not have.
+- The asset library and the publishing queue are still placeholders. The generation prompt and article library surfaces are wired to real data.
+- The panel only reads the article library; it offers no UI to edit an article, move its publication state, or delete it — those operations are left to the model tools and a later release.
+- The panel shows the most recently updated draft. The draft is one per session; across several Sessions it picks the one with the largest `updatedAt`. A selection rule for a second draft is not part of this release.
+- The article list is read on mount and on connection reset; there is no live push subscription for articles a model writes mid-session, so an immediate refresh still needs a reconnect or reload.

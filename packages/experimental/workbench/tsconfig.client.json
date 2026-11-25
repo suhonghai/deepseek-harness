@@ -7,11 +7,20 @@
   },
   "include": [
     "src/client",
-    "src/css-modules.d.ts"
+    "src/css-modules.d.ts",
+    "src/host/article-domain.ts",
+    "src/host/draft-types.ts",
+    "src/host/types.ts"
   ],
   "references": [
     {
       "path": "../../../vendor/cordis"
+    },
+    {
+      "path": "../../api/remotes/tsconfig.client.json"
+    },
+    {
+      "path": "../../api/session-controller/tsconfig.client.json"
     },
     {
       "path": "../../client/locale/tsconfig.client.json"
@@ -30,6 +39,9 @@
     },
     {
       "path": "../../client/ui-sidebar"
+    },
+    {
+      "path": "../../client/ui-workspace/tsconfig.client.json"
     },
     {
       "path": "../../client/ui-slots"

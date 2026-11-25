@@ -193,6 +193,7 @@ export const SERVICE_PAGE: Record<string, string> = {
  */
 export const SERVICE_WALK_EXEMPTIONS: Record<string, string> = {
   promptDrafts: 'experimental same-session prompt-draft domain — packages/experimental/workbench/README.md owns the behavior',
+  articles: 'experimental durable article-library service (Remote + model tools) — packages/experimental/workbench/README.md owns the behavior',
   timeline: 'experimental session data service internal to the bundle — packages/experimental/timeline/README.md owns its behavior',
   contextMenus: 'client-side interface-typed menu registry — packages/client/ui-context-menu/README.md owns the API',
   fileActions: 'client-side interface-typed file actions — packages/client/ui-file-actions/README.md owns the API',

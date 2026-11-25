@@ -4,18 +4,29 @@
  * 面板挂在 ui-layout 的 `main` keyed slot 上,左侧栏图标挂在 `sidebar.panellist`
  * list slot 上 —— 与官方插件管理页(Plugins)走同一条路,所以侧栏的选中态、面板切换
  * 行为都由 ui-layout / ui-sidebar 负责,这里只提供内容。
+ *
+ * 数据走两条通道:草稿用会话投影(Control Stream 实时推送),文章库用挂载的
+ * `articles` Remote。面板是全局面板,不绑定单个会话。
  */
 
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { MainPanelId } from '@deepseek-ai/dsh-client-ui-layout/client'
+import remote from '@deepseek-ai/dsh-workbench/remote'
 // Type-only: pulls the locale plugin's Context merge (ctx.locale).
 import type {} from '@deepseek-ai/dsh-client-locale/client'
 // Type-only: pulls the slot registry's Context merge (ctx.slots).
 import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 // Type-only: pulls the sidebar's SlotMap merge (the 'sidebar.panellist' entry).
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
+// Type-only: pulls ctx.remote / ctx.uiWorkspace / ctx.sessions merges.
+import type {} from '@deepseek-ai/dsh-api-remotes/client'
+import type {} from '@deepseek-ai/dsh-client-ui-workspace/client'
+import type {} from '@deepseek-ai/dsh-api-session-controller/client'
+import type { WorkbenchFace } from './WorkbenchPage.tsx'
 import { WorkbenchPage } from './WorkbenchPage.tsx'
 import { WorkbenchPanelIcon } from './WorkbenchPanelIcon.tsx'
+import { createArticlesStore } from './articles-store.ts'
 import { de, en, es, fr, ja, pt, ru, zh, type WorkbenchKey } from './locales.ts'
 
 /** Locale namespace of the workbench surfaces. */
@@ -32,28 +43,41 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 }
 
 /** Services required by the workbench client plugin. */
-export const inject = ['slots', 'locale', 'layout']
+export const inject = ['slots', 'locale', 'layout', 'remote', 'uiWorkspace']
 
 /**
- * Mount the workbench panel and its sidebar entry.
+ * Mount the workbench Remote, then its panel and sidebar entry.
  * @param ctx - the browser plugin context.
+ * @returns a disposer that removes the Remote when the plugin is torn down.
  */
-export function apply(ctx: ClientContext): void {
-  ctx.effect(() => ctx.locale.register(NS, { zh, en, ja, es, fr, de, ru, pt }), 'workbench: dictionaries')
+export async function apply(ctx: ClientContext): Promise<() => Promise<void>> {
+  const disposeRemote = await ctx.remote.$mount(remote)
+  try {
+    ctx.effect(() => ctx.locale.register(NS, { zh, en, ja, es, fr, de, ru, pt }), 'workbench: dictionaries')
+    const articles = createArticlesStore(ctx)
 
-  ctx.slots.inject('main', function* () {
-    yield ctx.slots.register({
-      name: 'main',
-      key: PANEL_ID,
+    ctx.slots.inject('main', function* () {
+      yield ctx.slots.register({
+        name: 'main',
+        key: PANEL_ID,
+        locale: NS,
+        inject: (): WorkbenchFace => ({
+          hooks: { articles },
+          openChat: (sessionId: SessionId) => { ctx.uiWorkspace.openSession(sessionId) },
+        }),
+      }, WorkbenchPage)
+    })
+
+    ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({
+      name: 'sidebar.panellist',
+      id: PANEL_ID,
+      order: 5,
       locale: NS,
-    }, WorkbenchPage)
-  })
-
-  ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({
-    name: 'sidebar.panellist',
-    id: PANEL_ID,
-    order: 5,
-    locale: NS,
-    label: () => ctx.locale.bind(NS)('nav'),
-  }, WorkbenchPanelIcon))
+      label: () => ctx.locale.bind(NS)('nav'),
+    }, WorkbenchPanelIcon))
+  } catch (error: unknown) {
+    await disposeRemote()
+    throw error
+  }
+  return async () => { await disposeRemote() }
 }

@@ -109,7 +109,7 @@ export class ArticleService extends TypertRemoteService {
    * @returns The matching articles, newest update first.
    */
   @Remote('list')
-  async list(request: ArticleListRequest = {}): Promise<ArticleRecord[]> {
+  async list(request: ArticleListRequest): Promise<ArticleRecord[]> {
     const table = await this.table()
     const status = request.status
     const articles = [...table.entries()].map(([, record]) => record)

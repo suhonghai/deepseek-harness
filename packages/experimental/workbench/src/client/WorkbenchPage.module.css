@@ -1,10 +1,32 @@
+/**
+ * Workbench visual language, adapted from WorkBuddy's light theme tokens
+ * (spacing 4/8/12/16/24, radii 4/6/8/16, text #333/#666, borders #e1e1e1,
+ * card #fafafa, hover #f2f2f2, focus green #00b96b, link #006ab1).
+ * Values are set once here so the panel renders consistently regardless of
+ * which host theme variables happen to be present.
+ */
+
 .page {
+  --wb-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --wb-text: #333;
+  --wb-text-secondary: #666;
+  --wb-text-muted: #999;
+  --wb-border: #e1e1e1;
+  --wb-card-bg: #fafafa;
+  --wb-hover-bg: #f2f2f2;
+  --wb-link: #006ab1;
+  --wb-green: #00b96b;
+  --wb-radius: 8px;
+  --wb-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+
   display: flex;
   flex-direction: column;
   gap: 24px;
   padding: 24px;
   overflow-y: auto;
   height: 100%;
+  font-family: var(--wb-font);
+  color: var(--wb-text);
 }
 
 .header {
@@ -17,11 +39,13 @@
   margin: 0;
   font-size: 20px;
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .intro {
   margin: 0;
-  opacity: 0.72;
+  font-size: 13px;
+  color: var(--wb-text-secondary);
 }
 
 .grid {
@@ -35,9 +59,15 @@
   flex-direction: column;
   gap: 8px;
   padding: 16px;
-  border: 1px solid var(--dsw-alias-border-color-default, rgba(127, 127, 127, 0.24));
-  border-radius: 12px;
-  background: var(--dsw-alias-bg-layer-1, transparent);
+  border: 1px solid var(--wb-border);
+  border-radius: var(--wb-radius);
+  background: var(--wb-card-bg);
+  box-shadow: var(--wb-shadow);
+}
+
+/* The prompt draft occupies the full row; the other three faces share the next. */
+.cardWide {
+  grid-column: 1 / -1;
 }
 
 .cardTitle {
@@ -48,15 +78,150 @@
 
 .cardHint {
   margin: 0;
-  opacity: 0.72;
+  font-size: 12px;
+  color: var(--wb-text-secondary);
 }
 
 .badge {
   align-self: flex-start;
   margin-top: 4px;
   padding: 2px 8px;
+  border: 1px solid transparent;
   border-radius: 999px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--wb-text-secondary);
+  background: #0000000d;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 0 4px;
+  font-size: 13px;
+  color: var(--wb-text-secondary);
+}
+
+.emptyHint {
   font-size: 12px;
-  opacity: 0.64;
-  background: var(--dsw-alias-bg-layer-2, rgba(127, 127, 127, 0.12));
+  color: var(--wb-text-muted);
+}
+
+.error {
+  color: #cf222e;
+}
+
+.draft {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.draftHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.draftHead .badge {
+  margin-top: 0;
+  color: var(--wb-link);
+  background: #006ab114;
+}
+
+.draftTitle {
+  font-size: 14px;
+}
+
+.draftBody {
+  margin: 0;
+  padding: 12px 14px;
+  max-height: 220px;
+  overflow: auto;
+  border: 1px solid var(--wb-border);
+  border-radius: 6px;
+  font-family: var(--wb-font);
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--wb-text);
+  background: #fff;
+}
+
+.draftMeta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--wb-text-muted);
+}
+
+.action {
+  align-self: flex-start;
+  padding: 7px 14px;
+  border: 1px solid var(--wb-border);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #fff;
+  background: var(--wb-green);
+  transition: background 0.15s ease;
+}
+
+.action:hover {
+  background: #00a55e;
+}
+
+.articleList {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.articleRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--wb-border);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.articleTitle {
+  font-size: 13px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.articleRow .badge {
+  margin-top: 0;
+}
+
+.articleTime {
+  grid-column: 1 / -1;
+  font-size: 11px;
+  color: var(--wb-text-muted);
+}
+
+.published {
+  color: #1a7f37;
+  background: #1a7f3714;
+}
+
+.ready {
+  color: #9a6700;
+  background: #9a670014;
 }

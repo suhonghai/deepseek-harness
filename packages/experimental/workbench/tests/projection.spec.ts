@@ -14,8 +14,7 @@ import AgentRegistry from '@deepseek-ai/dsh-agent'
 import type { Agent, AgentStatus } from '@deepseek-ai/dsh-agent'
 import { createUserMessage } from '@deepseek-ai/dsh-llm'
 import type { ContextFormed } from '@deepseek-ai/dsh-llm'
-import SessionStore from '@deepseek-ai/dsh-session'
-import type { Session } from '@deepseek-ai/dsh-session'
+import SessionStore, { Session, SessionId, SessionLogOffset } from '@deepseek-ai/dsh-session'
 import SessionProjectionRegistry from '@deepseek-ai/dsh-session-projection'
 import { brandString } from '@deepseek-ai/dsh-brand'
 import { unsupportedModel, unsupportedInbox } from '@deepseek-ai/dsh-agent-loop-testkit'
@@ -139,7 +138,7 @@ describe('prompt-draft projection unit', () => {
 
   it('retains strict replay failures without throwing from the projection drive', () => {
     const definition = createDraftProjectionDefinition(20)
-    const empty = definition.init()
+    const empty = definition.init(Session.create(SessionId('projection-replay')).header, SessionLogOffset(0))
     expect(definition.stateSchema.parse(empty)).toEqual(empty)
     const user = {
       type: 'user/message', seq: 0, time: 1,
@@ -171,7 +170,7 @@ describe('prompt-draft projection unit', () => {
 
   it('rejects a state whose current draft id is not retained among the seen ids', () => {
     const definition = createDraftProjectionDefinition(20)
-    const empty = definition.init()
+    const empty = definition.init(Session.create(SessionId('projection-replay')).header, SessionLogOffset(0))
     const state: DraftProjectionState = {
       ...empty,
       current: {
