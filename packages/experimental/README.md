@@ -77,6 +77,8 @@ Promotion requires a named product role, documented public behavior and limitati
 | [`cua-mcp`](cua-mcp/README.md) | Computer Use as an MCP stdio server for external agent harnesses, served by the `cua-mcp` profile | — |
 | [`timeline`](timeline/README.md) | Task trees, progress bars, and interval reports for the current session | `ctx.timeline` |
 | [`workbench`](workbench/README.md) | A publishing workbench panel: the generation prompt the agent refines, plus the article, asset, and publishing surfaces | — |
+| [`tool-prompt-draft`](tool-prompt-draft/README.md) | Model-facing prompt-draft tools over the workbench draft domain | `ctx.promptDrafts` |
+| [`tool-articles`](tool-articles/README.md) | Model-facing article-library tools over the workbench article library | `ctx.articles` |
 | [`computer-use-cua-driver-mcp`](computer-use-cua-driver-mcp/README.md) | Use an installed Cua Driver through MCP | `ctx.computerUse` |
 | [`computer-use-cua-driver-native`](computer-use-cua-driver-native/README.md) | Embed the Cua Driver native npm runtime | `ctx.computerUse` |
 | [`browser-use-playwright-mcp`](browser-use-playwright-mcp/README.md) | Playwright browser tools over MCP | `ctx.browserUse` |

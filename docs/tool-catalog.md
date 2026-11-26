@@ -37,6 +37,8 @@ This table connects model-visible tool names to the plugin package and service s
 | `@deepseek-ai/dsh-terminal-panel` | `user_terminal_list`, `user_terminal_read` | `ctx.tools`, `ctx.systemPrompt`, `ctx.terminals`, `ctx.terminalController`, `ctx.sandboxPolicy`, `a calling Agent` | `tool/call`, `tool/result` | - | The package also serves the six `terminal_*` tools from Web sidebar terminals. `user_terminal_list` and `user_terminal_read` only read terminals the user controls; `readUserTerminals: false` removes both. |
 | `@deepseek-ai/dsh-tool-goal` | `create_goal`, `get_goal`, `update_goal` | `ctx.tools`, `ctx.agents`, `ctx.goals`, `ctx.systemPrompt`, `a calling Agent in an authorized open turn` | `tool/call`, `goal/change for mutations`, `tool/result` | - | create, edit, pause, and resume require direct-human root authority; complete and blocked also accept the exact current goal round. The default blocked lower bound is three admitted rounds. |
 | `@deepseek-ai/dsh-tool-schedule` | `schedule_create`, `schedule_edit`, `schedule_list`, `schedule_view` | `ctx.tools`, `ctx.schedule`, `ctx.systemPrompt` | `tool/call`, `Schedule storage domain create, update, or delete`, `tool/result` | - | A preset or Agent scope mounts this package and decides which agents receive its tools. Management reads and writes Host tasks by id across Sessions. Tasks store an RFC 5545 recurrence and an existing, first-created-and-reused, or per-run-new Session target. Delegated subagents cannot call these tools. |
+| `@deepseek-ai/dsh-tool-prompt-draft` | `get_prompt_draft`, `update_prompt_draft` | `ctx.tools`, `ctx.promptDrafts`, `ctx.systemPrompt`, `ctx.agents`, `a calling Agent` | `tool/call`, `a durable prompt-draft session event`, `tool/result` | - | A preset or Agent scope mounts this package and decides which agents receive its tools. The draft belongs to the Host workbench domain and is event-sourced from the Session log; an update is compare-and-set against the revision the read returned. |
+| `@deepseek-ai/dsh-tool-articles` | `get_article`, `list_articles`, `save_article` | `ctx.tools`, `ctx.articles`, `ctx.systemPrompt` | `tool/call`, `article library create or replace`, `tool/result` | - | A preset or Agent scope mounts this package and decides which agents receive its tools. The library is shared by every conversation of the profile; the listing shows an excerpt and the reader returns the full body. |
 | `@deepseek-ai/dsh-tool-lsp` | `lsp` | `ctx.workingDirectory`, `ctx.tools`, `ctx.lsp`, `ctx.systemPrompt` | `tool/call`, `tool/result` | - | The lsp tool keeps provider selection and language-server subprocesses behind ctx.lsp, so its model-visible schema stays stable across providers. Requires a registered provider (e.g. `@deepseek-ai/dsh-lsp-stdio`) at runtime; without one, a query returns the structured `LSP_UNAVAILABLE` error rather than changing the schema. |
 | `@deepseek-ai/dsh-tool-ralph` | `ralph` | `ctx.tools`, `ctx.workflowEngine`, `ctx.subagents`, `ctx.systemPrompt`, `a calling Agent (exec.agent parents every fresh round)` | `tool/call`, `tool/result`, `workflow and child session events during execution` | - | A fixed foreground workflow starts one fresh structured child per round; the model selects only the immutable objective and an optional round cap. |
 | `@deepseek-ai/dsh-tool-skill` | `skill` | `ctx.workingDirectory`, `ctx.tools`, `ctx.agents`, `ctx.skills` | `tool/call`, `tool/result`, `user/message replacement catalogs via agent.inject()` | - | - |
@@ -1793,6 +1795,149 @@ View one scheduled task by id.
 Source: [`packages/schedule/tool-schedule/src/index.ts`](../packages/schedule/tool-schedule/src/index.ts)
 
 A preset or Agent scope mounts this package and decides which agents receive its tools. Management reads and writes Host tasks by id across Sessions. Tasks store an RFC 5545 recurrence and an existing, first-created-and-reused, or per-run-new Session target. Delegated subagents cannot call these tools.
+
+<a id="deepseek-aidsh-tool-prompt-draft"></a>
+
+## `@deepseek-ai/dsh-tool-prompt-draft`
+
+### `get_prompt_draft`
+
+Read the current session prompt draft — the article-generation prompt you and the user are refining together. Returns its id and revision, which update_prompt_draft requires.
+
+```json
+{
+  "type": "object",
+  "properties": {}
+}
+```
+
+Source: [`packages/experimental/tool-prompt-draft/src/index.ts`](../packages/experimental/tool-prompt-draft/src/index.ts)
+
+### `update_prompt_draft`
+
+Rewrite the current session prompt draft. The user is refining one article-generation prompt with you, so edit it whenever their feedback changes it. Pass the id and revision that get_prompt_draft returned; omit both only when no draft exists yet.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "draft_id": {
+      "type": "string",
+      "description": "Exact draft id returned by get_prompt_draft; omit only when no draft exists yet."
+    },
+    "revision": {
+      "type": "number",
+      "description": "Exact positive revision returned by get_prompt_draft; omit only when no draft exists yet."
+    },
+    "title": {
+      "type": "string",
+      "description": "Replacement draft label."
+    },
+    "body": {
+      "type": "string",
+      "description": "Replacement article-generation prompt."
+    }
+  }
+}
+```
+
+Source: [`packages/experimental/tool-prompt-draft/src/index.ts`](../packages/experimental/tool-prompt-draft/src/index.ts)
+
+A preset or Agent scope mounts this package and decides which agents receive its tools. The draft belongs to the Host workbench domain and is event-sourced from the Session log; an update is compare-and-set against the revision the read returned.
+
+<a id="deepseek-aidsh-tool-articles"></a>
+
+## `@deepseek-ai/dsh-tool-articles`
+
+### `get_article`
+
+Read one saved article by the id list_articles returned. The result carries the full article body.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "article_id": {
+      "type": "string",
+      "description": "Exact article id returned by list_articles."
+    }
+  },
+  "required": [
+    "article_id"
+  ]
+}
+```
+
+Source: [`packages/experimental/tool-articles/src/index.ts`](../packages/experimental/tool-articles/src/index.ts)
+
+### `list_articles`
+
+List the articles saved in the workbench library — the pieces written by earlier conversations. Call it to learn which articles exist and their ids; read one with get_article.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "description": "Keep only the articles in this publication state; omit to list every article.",
+      "enum": [
+        "draft",
+        "ready",
+        "published"
+      ]
+    }
+  }
+}
+```
+
+Source: [`packages/experimental/tool-articles/src/index.ts`](../packages/experimental/tool-articles/src/index.ts)
+
+### `save_article`
+
+Store an article in the workbench library, or revise one already there. Pass the id of an existing article to replace it; omit the id to store a new piece. The library is shared by every conversation.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Id of an existing article to revise; omit to store a new one."
+    },
+    "title": {
+      "type": "string",
+      "description": "Human title of the article."
+    },
+    "body": {
+      "type": "string",
+      "description": "The article body."
+    },
+    "sessionId": {
+      "type": "string",
+      "description": "The conversation this article came from."
+    },
+    "status": {
+      "type": "string",
+      "description": "Publication state; the service stores `draft` when omitted.",
+      "enum": [
+        "draft",
+        "ready",
+        "published"
+      ]
+    }
+  },
+  "required": [
+    "title",
+    "body",
+    "sessionId"
+  ]
+}
+```
+
+Source: [`packages/experimental/tool-articles/src/index.ts`](../packages/experimental/tool-articles/src/index.ts)
+
+A preset or Agent scope mounts this package and decides which agents receive its tools. The library is shared by every conversation of the profile; the listing shows an excerpt and the reader returns the full body.
 
 <a id="deepseek-aidsh-tool-lsp"></a>
 

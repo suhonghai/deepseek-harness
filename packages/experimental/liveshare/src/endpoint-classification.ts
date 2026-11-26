@@ -108,6 +108,11 @@ export const VIEWER_ENDPOINT_CLASSES = {
   // decides whether one installed plugin's method reaches its viewers; this table only decides what
   // the core share roles grant.
   'account/cancelSignIn': 'owner-only', // owner account and sign-in; the served page never reads it
+  'articles/delete': 'owner-only', // the owner's article library; a share viewer never reaches it
+  'articles/get': 'owner-only', // the owner's article library; a share viewer never reaches it
+  'articles/list': 'owner-only', // the owner's article library; a share viewer never reaches it
+  'articles/put': 'owner-only', // the owner's article library; a share viewer never reaches it
+  'articles/update': 'owner-only', // the owner's article library; a share viewer never reaches it
   'account/getBalance': 'owner-only', // owner account and sign-in; the served page never reads it
   'account/getProfile': 'owner-only', // owner account and sign-in; the served page never reads it
   'account/getState': 'owner-only', // owner account and sign-in; the served page never reads it

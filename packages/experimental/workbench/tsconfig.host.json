@@ -9,13 +9,11 @@
     "src/index.ts",
     "src/host/article-domain.ts",
     "src/host/article-service.ts",
-    "src/host/article-tools.ts",
     "src/host/draft-command.ts",
     "src/host/draft-domain.ts",
     "src/host/draft-fold.ts",
     "src/host/draft-runtime.ts",
     "src/host/draft-service.ts",
-    "src/host/draft-tools.ts",
     "src/host/draft-types.ts",
     "src/host/types.ts"
   ],

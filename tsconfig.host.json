@@ -366,6 +366,8 @@
     { "path": "./packages/experimental/cua/tsconfig.host.json" },
     { "path": "./packages/experimental/timeline/tsconfig.host.json" },
     { "path": "./packages/experimental/workbench/tsconfig.host.json" },
+    { "path": "./packages/experimental/tool-articles" },
+    { "path": "./packages/experimental/tool-prompt-draft" },
     { "path": "./packages/experimental/cua-bundle" },
     { "path": "./packages/experimental/cua-macos" },
     { "path": "./packages/experimental/cua-mcp" },

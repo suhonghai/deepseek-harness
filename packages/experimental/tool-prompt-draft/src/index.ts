@@ -1,21 +1,24 @@
 /**
  * Model-facing `get_prompt_draft` and `update_prompt_draft` tools over the
  * persisted same-session prompt draft, plus the system-prompt section that
- * keeps the current draft visible to the model at all times.
+ * keeps the current draft visible to the model at all times. The draft domain
+ * itself belongs to the Host `@deepseek-ai/dsh-workbench` package; mounting
+ * this plugin registers the tools in the mounting scope, so a preset decides
+ * which agents receive them.
  *
- * @module @deepseek-ai/dsh-workbench/host/draft-tools
+ * @module @deepseek-ai/dsh-tool-prompt-draft
  */
 
 import type { Context } from '@deepseek-ai/cordis'
+import type { Agent } from '@deepseek-ai/dsh-agent'
+import { brandString } from '@deepseek-ai/dsh-brand'
 import { HarnessError } from '@deepseek-ai/dsh-llm'
+import type { AssembleContext } from '@deepseek-ai/dsh-system-prompt'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import type { GenericCallView, ToolRunContext } from '@deepseek-ai/dsh-tools'
-import type { Agent } from '@deepseek-ai/dsh-agent'
-import type { AssembleContext } from '@deepseek-ai/dsh-system-prompt'
-import { brandString } from '@deepseek-ai/dsh-brand'
-import type { DraftId, DraftRef, DraftView } from './draft-types.ts'
+import type { DraftId, DraftRef, DraftView } from '@deepseek-ai/dsh-workbench/src/host/draft-types.ts'
 // Type-only: pulls the Context merge that declares `ctx.promptDrafts`.
-import type {} from './draft-service.ts'
+import type {} from '@deepseek-ai/dsh-workbench/src/host/draft-service.ts'
 
 /** The prompt-draft tool plugin. */
 export const name = 'tool-prompt-draft'

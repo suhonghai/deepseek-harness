@@ -65,6 +65,11 @@ import * as ToolPty from '@deepseek-ai/dsh-tool-terminal'
 import * as TerminalPanel from '@deepseek-ai/dsh-terminal-panel'
 import * as ToolGoal from '@deepseek-ai/dsh-tool-goal'
 import * as ToolSchedule from '@deepseek-ai/dsh-tool-schedule'
+import * as ToolPromptDraft from '@deepseek-ai/dsh-tool-prompt-draft'
+import * as ToolArticles from '@deepseek-ai/dsh-tool-articles'
+// Type-only: make `ctx.promptDrafts` and `ctx.articles` resolve to the Host services these tools read.
+import type {} from '@deepseek-ai/dsh-workbench/src/host/draft-service.ts'
+import type {} from '@deepseek-ai/dsh-workbench/src/host/article-service.ts'
 import ScheduleService from '@deepseek-ai/dsh-schedule'
 import Lsp from '@deepseek-ai/dsh-lsp'
 import * as ToolLsp from '@deepseek-ai/dsh-tool-lsp'
@@ -534,6 +539,39 @@ const TOOL_PACKAGES: ToolPackage[] = [
       + 'Management reads and writes Host tasks by id across Sessions. '
       + 'Tasks store an RFC 5545 recurrence and an existing, first-created-and-reused, or per-run-new Session target. '
       + 'Delegated subagents cannot call these tools.',
+  },
+  {
+    pkg: '@deepseek-ai/dsh-tool-prompt-draft',
+    dir: 'tool-prompt-draft',
+    source: 'packages/experimental/tool-prompt-draft/src/index.ts',
+    requires: ['ctx.tools', 'ctx.promptDrafts', 'ctx.systemPrompt', 'ctx.agents', 'a calling Agent'],
+    writes: ['tool/call', 'a durable prompt-draft session event', 'tool/result'],
+    async mount(ctx) {
+      // Schema harvest never executes a tool, so the Host draft domain is a stub that answers no read.
+      await ctx.plugin(AgentRegistry)
+      ctx.provide('promptDrafts', {} as Context['promptDrafts'])
+      await ctx.plugin(ToolPromptDraft)
+    },
+    note:
+      'A preset or Agent scope mounts this package and decides which agents receive its tools. '
+      + 'The draft belongs to the Host workbench domain and is event-sourced from the Session log; '
+      + 'an update is compare-and-set against the revision the read returned.',
+  },
+  {
+    pkg: '@deepseek-ai/dsh-tool-articles',
+    dir: 'tool-articles',
+    source: 'packages/experimental/tool-articles/src/index.ts',
+    requires: ['ctx.tools', 'ctx.articles', 'ctx.systemPrompt'],
+    writes: ['tool/call', 'article library create or replace', 'tool/result'],
+    async mount(ctx) {
+      // Schema harvest never executes a tool, so the Host article library is a stub that answers no read.
+      ctx.provide('articles', {} as Context['articles'])
+      await ctx.plugin(ToolArticles)
+    },
+    note:
+      'A preset or Agent scope mounts this package and decides which agents receive its tools. '
+      + 'The library is shared by every conversation of the profile; the listing shows an excerpt '
+      + 'and the reader returns the full body.',
   },
   {
     pkg: '@deepseek-ai/dsh-tool-lsp',

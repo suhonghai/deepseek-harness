@@ -1,18 +1,20 @@
 /**
- * Model-facing `list_articles` and `get_article` tools over the durable
- * article library, plus the system-prompt section that tells the model the
- * library exists. The library itself is not model-visible; only what these
- * tools return is.
+ * Model-facing `list_articles`, `get_article`, and `save_article` tools over
+ * the durable article library, plus the system-prompt section that tells the
+ * model the library exists. The library itself belongs to the Host
+ * `@deepseek-ai/dsh-workbench` package and is not model-visible; only what
+ * these tools return is. Mounting this plugin registers the tools in the
+ * mounting scope, so a preset decides which agents receive them.
  *
- * @module @deepseek-ai/dsh-workbench/host/article-tools
+ * @module @deepseek-ai/dsh-tool-articles
  */
 
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import type { GenericCallView } from '@deepseek-ai/dsh-tools'
-import type { ArticleStatus } from './article-domain.ts'
+import type { ArticleStatus } from '@deepseek-ai/dsh-workbench/src/host/article-domain.ts'
 // Type-only: pulls the Context merge that declares `ctx.articles`.
-import type {} from './article-service.ts'
+import type {} from '@deepseek-ai/dsh-workbench/src/host/article-service.ts'
 
 /** The article-library tool plugin. */
 export const name = 'tool-articles'
@@ -40,6 +42,10 @@ const LIST_DESCRIPTION =
 
 const GET_DESCRIPTION =
   'Read one saved article by the id list_articles returned. The result carries the full article body.'
+
+const SAVE_DESCRIPTION =
+  'Store an article in the workbench library, or revise one already there. Pass the id of an existing '
+  + 'article to replace it; omit the id to store a new piece. The library is shared by every conversation.'
 
 /** One article as the list shows it. */
 interface ArticleSummary {
@@ -69,6 +75,9 @@ interface ArticleListValue {
 
 /** Canonical output of `get_article`. */
 type ArticleGetValue = { article: null } | { article: ArticleValue }
+
+/** Canonical output of `save_article`. */
+type ArticleSaveValue = { article: ArticleValue }
 
 /** The fields every listed article carries. */
 const SUMMARY_FIELDS = {
@@ -137,6 +146,22 @@ const GET_OUTPUT = {
   render: (_args: unknown, value: ArticleGetValue) => [{ type: 'text' as const, text: JSON.stringify(value) }],
 } as const
 
+/** Output of the writer: the stored record as the library now holds it. */
+const SAVE_OUTPUT = {
+  schema: {
+    type: 'object',
+    additionalProperties: false,
+    properties: {
+      article: {
+        type: 'object',
+        additionalProperties: false,
+        properties: ARTICLE_FIELDS,
+      },
+    },
+  },
+  render: (_args: unknown, value: ArticleSaveValue) => [{ type: 'text' as const, text: JSON.stringify(value) }],
+} as const
+
 /** Generic, args-only pending presentation shared by the article tools. */
 function present(title: string, kind: 'read' | 'other', rawInput?: unknown): GenericCallView {
   return { card: 'generic', title, kind, ...rawInput === undefined ? {} : { rawInput } }
@@ -160,6 +185,7 @@ export function apply(ctx: Context): void {
       '<article_library>',
       'The workbench keeps saved articles in a durable library that every conversation shares.',
       'Call list_articles to see which articles exist, and get_article with an article id to read one.',
+      'Call save_article to store a finished piece in the library; pass the id of an existing article to revise it.',
       '</article_library>',
     ].join('\n'),
     interpolate: false,
@@ -221,5 +247,58 @@ export function apply(ctx: Context): void {
       }
     },
     presentCall: args => present('Read article', 'read', args.article_id),
+  }))
+
+  ctx.tools.register(defineTool({
+    name: 'save_article',
+    description: SAVE_DESCRIPTION,
+    parameters: {
+      id: {
+        type: 'string',
+        description: 'Id of an existing article to revise; omit to store a new one.',
+      },
+      title: {
+        type: 'string',
+        required: true,
+        description: 'Human title of the article.',
+      },
+      body: {
+        type: 'string',
+        required: true,
+        description: 'The article body.',
+      },
+      sessionId: {
+        type: 'string',
+        required: true,
+        description: 'The conversation this article came from.',
+      },
+      status: {
+        type: 'string',
+        enum: ARTICLE_STATUSES,
+        description: 'Publication state; the service stores `draft` when omitted.',
+      },
+    },
+    output: SAVE_OUTPUT,
+    async execute(args) {
+      const saved = await ctx.articles.put({
+        ...(args.id === undefined ? {} : { id: args.id }),
+        title: args.title,
+        body: args.body,
+        sessionId: args.sessionId,
+        ...(args.status === undefined ? {} : { status: args.status }),
+      })
+      return {
+        article: {
+          id: saved.id,
+          title: saved.title,
+          body: saved.body,
+          sessionId: saved.sessionId,
+          status: saved.status,
+          createdAt: saved.createdAt,
+          updatedAt: saved.updatedAt,
+        },
+      }
+    },
+    presentCall: args => present('Save article', 'other', args.title),
   }))
 }

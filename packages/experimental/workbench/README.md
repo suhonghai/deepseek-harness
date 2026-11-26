@@ -40,9 +40,9 @@ Installing the bundle is what puts the panel on screen and the draft in the sess
 <a id="understand-the-implementation"></a>
 ## Understand the implementation
 
-The package has two faces. The host face (`src/index.ts`) mounts the article library, the prompt-draft domain, their model tools, and the `/draft` command. The browser face (`src/client/`) registers the panel on the `main` keyed slot of the layout service and the sidebar entry on the `sidebar.panellist` list slot, the same two slots the shipped Plugins page uses. The sidebar owns the button, the label, and the selected state; the panel contributes content only. The browser face mounts this package's `remote` contract in `apply`, gains the `articles` Remote namespace, and tears the Remote down symmetrically with the UI.
+The package has two faces. The host face (`src/index.ts`) mounts the article library, the prompt-draft domain, and the `/draft` command. The browser face (`src/client/`) registers the panel on the `main` keyed slot of the layout service and the sidebar entry on the `sidebar.panellist` list slot, the same two slots the shipped Plugins page uses. The sidebar owns the button, the label, and the selected state; the panel contributes content only. The browser face mounts this package's `remote` contract in `apply`, gains the `articles` Remote namespace, and tears the Remote down symmetrically with the UI.
 
-The host face is split into one file per concern under `src/host/`. `article-domain.ts` holds the domain declaration, record schema, and Remote boundary types; `article-service.ts` owns `ctx.articles` (over the base bundle's storage-domain / json backend); `article-tools.ts` owns the model-facing `list_articles` / `get_article`. `types.ts` aggregates both domains' pure types and is the package's `./types` subpath. `draft-types.ts` holds the pure types and the `promptDraft` projection-key declaration, free of host imports so the browser half can project the same content. `draft-domain.ts` holds the durable change payloads and the `prompt-draft/change` session event. `draft-fold.ts` is the pure replay fold and its strict decoder. `draft-runtime.ts` holds the error codes and the change version. `draft-service.ts` owns the `ctx.promptDrafts` service, and `draft-tools.ts` and `draft-command.ts` own the model-facing and human-facing surfaces.
+The host face is split into one file per concern under `src/host/`. `article-domain.ts` holds the domain declaration, record schema, and Remote boundary types; `article-service.ts` owns `ctx.articles` (over the base bundle's storage-domain / json backend). `types.ts` aggregates both domains' pure types and is the package's `./types` subpath. `draft-types.ts` holds the pure types and the `promptDraft` projection-key declaration, free of host imports so the browser half can project the same content. `draft-domain.ts` holds the durable change payloads and the `prompt-draft/change` session event. `draft-fold.ts` is the pure replay fold and its strict decoder. `draft-runtime.ts` holds the error codes and the change version. `draft-service.ts` owns the `ctx.promptDrafts` service and `draft-command.ts` owns the human-facing surface. The two model-facing surfaces live in their own packages, `@deepseek-ai/dsh-tool-prompt-draft` and `@deepseek-ai/dsh-tool-articles`, because a tool registers inside the Agent scope that mounts it and the workbench preset decides which agents receive them.
 
 The panel reads from two sources: drafts come from the `promptDraft` session projection (pushed live over the Control Stream, read across every Session through the global `useSessions` hook and picking the most recently updated one), and articles come from the `articles` Remote (`articles-store.ts` reads once on mount and again on connection reset). The panel is global and bound to no single Session.
 
@@ -87,63 +87,23 @@ None. The panel adds no request payload, no system prompt, and no tool schema.
 
 Unchanged. The panel adds no prefix to any model request, so request caching behaves exactly as it does without it.
 
-### Prompt draft
+### Model-facing tools
 
 #### What the model sees
 
-The draft's own text, in every turn. A prompt section renders the current draft's id, revision, title, and body; the body is the author's text, so it is data the package passes through rather than prose it owns.
-
-##### The prompt section's shape
-
-```markdown
-<prompt_draft>
-id: <draft id>
-revision: <draft revision>
-title: <draft title>
-
-<draft body>
-</prompt_draft>
-```
+Nothing from this package itself. The workbench host face registers no tool, no prompt section, and no model-visible event; the draft body and the article library reach the model only through the two tool packages the workbench preset mounts, `@deepseek-ai/dsh-tool-prompt-draft` and `@deepseek-ai/dsh-tool-articles`. Those packages own the prompt sections and the tool schemas, and each one documents what the model receives.
 
 #### Token effect
 
-The draft body is added to the system prompt of every request while a draft exists, so the cost tracks the length of the draft rather than the number of edits. Without a draft the section contributes nothing.
+None on its own. The token cost of the draft section and of the five tool schemas belongs to the two tool packages, and a preset that omits those rows pays neither.
 
 #### KV Cache effect
 
-Prefix-stable ahead of the section, which sits at order 2450 after the tool policies. A draft edit replaces the section's text and therefore invalidates reuse from that point rather than from the start of the system prompt.
-
-### Draft tools
-
-#### What the model sees
-
-Two tools. `get_prompt_draft` returns the current draft with the id and revision that `update_prompt_draft` requires, and `update_prompt_draft` replaces the title, the body, or both and advances the revision by one. A stale revision is rejected at execution. The model may rewrite the draft whenever the author's words call for it; nothing requires the author to have typed first.
-
-#### Token effect
-
-Two tool definitions on every request, plus one compact JSON result per call.
-
-#### KV Cache effect
-
-Prefix-stable while the tool definitions are unchanged. Calls and results append after the reusable request prefix without invalidating earlier entries.
-
-### Article library tools
-
-#### What the model sees
-
-Two read tools over the durable library: `list_articles` returns the stored article ids, titles, states, update times, and a short body excerpt (optionally filtered by state), and `get_article` reads one full body by id. The library itself is not injected into the prompt; only what these tools return is model-visible. A prompt section at order 2460 tells the model the library exists.
-
-#### Token effect
-
-Two additional tool definitions on every request, plus one JSON result per call. Stored article bodies enter a request only when a `get_article` result is present, so the cost tracks what the model actually reads, not the size of the library.
-
-#### KV Cache effect
-
-Tool definitions are stable, so the request prefix up to them is reusable. The article-library guidance section sits at 2460; calls and their results append after the reusable prefix without invalidating earlier entries.
+Unchanged. The workbench adds no prefix to any model request; the cache effects of the draft section and the tool schemas belong to the two tool packages.
 
 ## Known Limitations and Deferred Work
 
 - The asset library and the publishing queue are still placeholders. The generation prompt and article library surfaces are wired to real data.
-- The panel only reads the article library; it offers no UI to edit an article, move its publication state, or delete it — those operations are left to the model tools and a later release.
+- The panel only reads the article library; it offers no UI to edit an article, move its publication state, or delete it. The model writes and revises articles through `save_article`; a human-facing editor is left to a later release.
 - The panel shows the most recently updated draft. The draft is one per session; across several Sessions it picks the one with the largest `updatedAt`. A selection rule for a second draft is not part of this release.
 - The article list is read on mount and on connection reset; there is no live push subscription for articles a model writes mid-session, so an immediate refresh still needs a reconnect or reload.

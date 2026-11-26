@@ -135,6 +135,10 @@
             name: '@deepseek-ai/dsh-tool-present'
           - id: tool-office
             name: '@deepseek-ai/dsh-tool-office'
+          - id: tool-prompt-draft
+            name: '@deepseek-ai/dsh-tool-prompt-draft'
+          - id: tool-articles
+            name: '@deepseek-ai/dsh-tool-articles'
           - id: tool-plugin-manager
             name: '@deepseek-ai/dsh-plugin-manager/tools'
             disabled: !!js "!ctx.get('profileContext')"

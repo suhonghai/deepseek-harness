@@ -13,6 +13,8 @@ export const EXPERIMENTAL_PACKAGE_NAME_EXCEPTIONS: Readonly<Record<string, strin
   'packages/experimental/cua-windows': '@deepseek-ai/dsh-cua-windows',
   'packages/experimental/timeline': '@deepseek-ai/dsh-timeline',
   'packages/experimental/workbench': '@deepseek-ai/dsh-workbench',
+  'packages/experimental/tool-articles': '@deepseek-ai/dsh-tool-articles',
+  'packages/experimental/tool-prompt-draft': '@deepseek-ai/dsh-tool-prompt-draft',
   'packages/experimental/tool-session-query': '@deepseek-ai/dsh-tool-session-query',
   'packages/experimental/session-title-all-prompts-llm': '@deepseek-ai/dsh-session-title-all-prompts-llm',
   'packages/experimental/tool-terminal': '@deepseek-ai/dsh-tool-terminal',

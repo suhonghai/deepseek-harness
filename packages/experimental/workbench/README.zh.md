@@ -40,9 +40,9 @@ Web 客户端的内容生产工作台 bundle。它贡献一个全局面板 —�
 <a id="understand-the-implementation"></a>
 ## 理解实现
 
-这个包有两面。宿主面(`src/index.ts`)装载文章库、提示词草稿域、它们的模型工具和 `/draft` 命令。浏览器面(`src/client/`)把面板注册到布局服务的 `main` keyed slot、把侧栏入口注册到 `sidebar.panellist` list slot,与官方插件管理页走的是同两个 slot。按钮、标签和选中态由侧栏负责,面板只提供内容。浏览器半在 `apply` 里挂载本包的 `remote` 契约,拿到 `articles` Remote 命名空间,并挂载后卸载对称清理。
+这个包有两面。宿主面(`src/index.ts`)装载文章库、提示词草稿域和 `/draft` 命令。浏览器面(`src/client/`)把面板注册到布局服务的 `main` keyed slot、把侧栏入口注册到 `sidebar.panellist` list slot,与官方插件管理页走的是同两个 slot。按钮、标签和选中态由侧栏负责,面板只提供内容。浏览器半在 `apply` 里挂载本包的 `remote` 契约,拿到 `articles` Remote 命名空间,并挂载后卸载对称清理。
 
-宿主面在 `src/host/` 下按职责一个文件一个文件地拆开。`article-domain.ts` 放文章域声明、记录 schema 和 Remote 边界类型;`article-service.ts` 拥有 `ctx.articles` 服务(base bundle 的 storage-domain / json 后端);`article-tools.ts` 是面向模型的 `list_articles` / `get_article`。`types.ts` 聚合两个域的纯类型,是包 `./types` 子路径的落点。`draft-types.ts` 放纯类型和 `promptDraft` 投影键声明,不含宿主导入,浏览器半因此能投影同一份内容。`draft-domain.ts` 放持久变更载荷和 `prompt-draft/change` 会话事件。`draft-fold.ts` 是纯回放折叠与它的严格解码器。`draft-runtime.ts` 放错误码与变更版本。`draft-service.ts` 拥有 `ctx.promptDrafts` 服务,`draft-tools.ts` 和 `draft-command.ts` 分别拥有面向模型和面向用户的入口。
+宿主面在 `src/host/` 下按职责一个文件一个文件地拆开。`article-domain.ts` 放文章域声明、记录 schema 和 Remote 边界类型;`article-service.ts` 拥有 `ctx.articles` 服务(base bundle 的 storage-domain / json 后端)。`types.ts` 聚合两个域的纯类型,是包 `./types` 子路径的落点。`draft-types.ts` 放纯类型和 `promptDraft` 投影键声明,不含宿主导入,浏览器半因此能投影同一份内容。`draft-domain.ts` 放持久变更载荷和 `prompt-draft/change` 会话事件。`draft-fold.ts` 是纯回放折叠与它的严格解码器。`draft-runtime.ts` 放错误码与变更版本。`draft-service.ts` 拥有 `ctx.promptDrafts` 服务,`draft-command.ts` 拥有面向用户的入口。面向模型的两块面各自独立成包 —— `@deepseek-ai/dsh-tool-prompt-draft` 与 `@deepseek-ai/dsh-tool-articles` —— 因为工具注册发生在挂载它的 Agent 作用域内,由工作台 preset 决定哪些 agent 获得它们。
 
 面板的数据有两条来源:草稿走 `promptDraft` 会话投影(Control Stream 实时推送,用全局 `useSessions` hook 读所有会话的投影值,挑出最近更新的那份),文章走 `articles` Remote(`articles-store.ts` 在挂载时读一次,连接重置时重读)。面板是全局面板,不绑定单个会话。
 
@@ -87,64 +87,24 @@ Web 客户端的内容生产工作台 bundle。它贡献一个全局面板 —�
 
 不变。面板不给任何模型请求加前缀,所以请求缓存的行为与没有它时完全一致。
 
-### 提示词草稿
+### 面向模型的工具
 
 #### 模型看到什么
 
-每一轮都是草稿自己的文本。一个提示词小节渲染当前草稿的 id、修订号、标题和正文;正文是作者写的文字,属于这个包透传的数据,不是它自己拥有的文案。
-
-##### 提示词小节的形状
-
-```markdown
-<prompt_draft>
-id: <draft id>
-revision: <draft revision>
-title: <draft title>
-
-<draft body>
-</prompt_draft>
-```
+这个包自身什么都不提供。工作台宿主面不注册任何工具、提示词小节或模型可见事件;草稿正文与文章库只通过工作台 preset 挂载的两个工具包到达模型 —— `@deepseek-ai/dsh-tool-prompt-draft` 与 `@deepseek-ai/dsh-tool-articles`。这两个包各自拥有提示词小节与工具 schema,并各自记录模型接收到的内容。
 
 #### Token 影响
 
-草稿存在期间,草稿正文会被加进每次请求的系统提示词,开销因此跟着草稿长度走,而不是跟着编辑次数走。没有草稿时这个小节不贡献任何内容。
+自身没有开销。草稿小节与五个工具 schema 的 token 开销归这两个工具包;省略那两行的 preset 一分也不付。
 
 #### KV 缓存影响
 
-小节之前的前缀是稳定的;这个小节排在 2450,位于工具策略之后。一次草稿编辑替换掉小节的文本,因此从该处起让缓存失效,而不是从系统提示词开头起。
-
-### 草稿工具
-
-#### 模型看到什么
-
-两个工具。`get_prompt_draft` 返回当前草稿,连同 `update_prompt_draft` 需要的 id 和修订号;`update_prompt_draft` 替换标题、正文或两者,并把修订号推进一号。陈旧的修订号在执行时被拒绝。作者的话需要改写时,模型随时可以改写草稿;不要求作者先说过话。
-
-#### Token 影响
-
-每次请求带上两个工具定义,每次调用再带上一个紧凑的 JSON 结果。
-
-#### KV 缓存影响
-
-工具定义不变时前缀稳定。调用与结果追加在可复用的请求前缀之后,不会让更早的条目失效。
-
-### 文章库工具
-
-#### 模型看到什么
-
-面向持久文章库的两个只读工具:`list_articles` 返回已存文章的 id、标题、状态、更新时间和正文摘要(可按状态过滤),`get_article` 按 id 读取一整篇正文。文章库本身不注入提示词,模型只看到这两个工具返回的内容。排在 2460 的一个提示词小节告诉模型这个库存在。
-
-#### Token 影响
-
-每次请求多带两个工具定义,每次调用再带一个 JSON 结果。文章正文只在 `get_article` 的结果里进入请求,所以开销跟着模型实际读到的内容走,而不是跟着库的大小走。
-
-#### KV 缓存影响
-
-工具定义稳定,到它们为止的请求前缀可以复用。文章库引导小节排在 2460;调用与结果追加在可复用前缀之后,不会让更早的条目失效。
+不变。工作台不给任何模型请求加前缀;草稿小节与工具 schema 的缓存效果归这两个工具包。
 
 <a id="known-limitations-and-deferred-work"></a>
 ## 已知限制与暂缓事项
 
 - 素材库、发布队列仍然是占位。生成提示词与文章库接了真实数据。
-- 面板只读文章库,不提供文章的编辑、发布状态流转或删除界面 —— 这些操作目前由模型工具与后续版本补上。
+- 面板只读文章库,不提供文章的编辑、发布状态流转或删除界面。模型通过 `save_article` 写入与修订;面向人的编辑界面留到后续版本。
 - 面板展示的是「最近更新的那份草稿」。一个会话一份草稿,跨多个会话时取 `updatedAt` 最大的那份;第二份草稿的选择规则这一版还没有。
 - 文章列表在挂载与连接重置时读取,没有针对模型写入文章后的实时推送订阅;当次会话内的即时刷新仍需重连或重载面板。
