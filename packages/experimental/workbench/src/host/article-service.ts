@@ -202,8 +202,8 @@ export class ArticleService extends TypertRemoteService {
    * @param id - Identity of the article.
    * @returns Whether an article was removed.
    */
-  @Remote('remove')
-  async remove(id: string): Promise<boolean> {
+  @Remote('delete')
+  async delete(id: string): Promise<boolean> {
     const table = await this.table()
     return table.delete(id)
   }

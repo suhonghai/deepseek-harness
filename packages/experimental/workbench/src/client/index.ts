@@ -54,30 +54,34 @@ export async function apply(ctx: ClientContext): Promise<() => Promise<void>> {
   const disposeRemote = await ctx.remote.$mount(remote)
   try {
     ctx.effect(() => ctx.locale.register(NS, { zh, en, ja, es, fr, de, ru, pt }), 'workbench: dictionaries')
-    const articles = createArticlesStore(ctx)
+    // Wait for the mounted `articles` namespace before the panel's store reads it.
+    const ui = await ctx.inject(['remote.articles', 'slots', 'locale', 'uiWorkspace'], (uiCtx) => {
+      const articles = createArticlesStore(uiCtx)
 
-    ctx.slots.inject('main', function* () {
-      yield ctx.slots.register({
-        name: 'main',
-        key: PANEL_ID,
+      uiCtx.slots.inject('main', function* () {
+        yield uiCtx.slots.register({
+          name: 'main',
+          key: PANEL_ID,
+          locale: NS,
+          inject: (): WorkbenchFace => ({
+            hooks: { articles },
+            openChat: (sessionId: SessionId) => { uiCtx.uiWorkspace.openSession(sessionId) },
+          }),
+        }, WorkbenchPage)
+      })
+
+      uiCtx.slots.inject('sidebar.panellist', () => uiCtx.slots.register({
+        name: 'sidebar.panellist',
+        id: PANEL_ID,
+        order: 5,
         locale: NS,
-        inject: (): WorkbenchFace => ({
-          hooks: { articles },
-          openChat: (sessionId: SessionId) => { ctx.uiWorkspace.openSession(sessionId) },
-        }),
-      }, WorkbenchPage)
+        label: () => uiCtx.locale.bind(NS)('nav'),
+      }, WorkbenchPanelIcon))
     })
 
-    ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({
-      name: 'sidebar.panellist',
-      id: PANEL_ID,
-      order: 5,
-      locale: NS,
-      label: () => ctx.locale.bind(NS)('nav'),
-    }, WorkbenchPanelIcon))
+    return async () => { await ui.dispose(); await disposeRemote() }
   } catch (error: unknown) {
     await disposeRemote()
     throw error
   }
-  return async () => { await disposeRemote() }
 }

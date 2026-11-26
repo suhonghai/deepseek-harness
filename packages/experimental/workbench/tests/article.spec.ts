@@ -90,8 +90,8 @@ describe('article library service', () => {
   it('removes an article and reports whether a key existed', async () => {
     const { articles } = await harness()
     await articles.put({ id: 'gone', title: 'Gone', body: 'x', sessionId: 's' })
-    expect(await articles.remove('gone')).toBe(true)
-    expect(await articles.remove('gone')).toBe(false)
+    expect(await articles.delete('gone')).toBe(true)
+    expect(await articles.delete('gone')).toBe(false)
     expect(await articles.get('gone')).toBeUndefined()
   })
 })

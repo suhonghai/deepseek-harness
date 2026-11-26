@@ -55,14 +55,14 @@ const draftRevisionSchema: ZodType<DraftRevision> = zod.object({
   title: zod.string(),
   body: zod.string(),
   updatedAt: zod.number(),
-}) as ZodType<DraftRevision>
+})
 
 const draftProjectionSchema: ZodType<DraftProjection> = zod.object({
   draft: draftSnapshotSchema.nullable(),
   createdAt: zod.number().nullable(),
   updatedAt: zod.number().nullable(),
   versions: zod.array(draftRevisionSchema),
-}) as ZodType<DraftProjection>
+})
 
 const draftProjectionStateSchema: ZodType<DraftProjectionState> = zod.object({
   current: draftProjectionSchema,
@@ -81,7 +81,7 @@ const draftProjectionStateSchema: ZodType<DraftProjectionState> = zod.object({
   if (createdAt !== null && updatedAt !== null && updatedAt < createdAt) {
     context.addIssue({ code: 'custom', message: 'current draft update cannot precede its creation' })
   }
-}) as ZodType<DraftProjectionState>
+})
 
 /** Build strict fold state from one checkpoint-safe projection state. */
 function draftFoldState(state: DraftProjectionState): DraftFoldState {
