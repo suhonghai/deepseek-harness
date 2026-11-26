@@ -68,8 +68,10 @@ import * as ToolSchedule from '@deepseek-ai/dsh-tool-schedule'
 import * as ToolPromptDraft from '@deepseek-ai/dsh-tool-prompt-draft'
 import * as ToolArticles from '@deepseek-ai/dsh-tool-articles'
 // Type-only: make `ctx.promptDrafts` and `ctx.articles` resolve to the Host services these tools read.
-import type {} from '@deepseek-ai/dsh-workbench/src/host/draft-service.ts'
-import type {} from '@deepseek-ai/dsh-workbench/src/host/article-service.ts'
+// The package root re-exports both service modules, so their `declare module '@deepseek-ai/cordis'`
+// merges apply. A subpath import would not resolve here: this script sits outside every workspace
+// package, and `tsconfig.base.json` maps package names, not their subpaths.
+import type {} from '@deepseek-ai/dsh-workbench'
 import ScheduleService from '@deepseek-ai/dsh-schedule'
 import Lsp from '@deepseek-ai/dsh-lsp'
 import * as ToolLsp from '@deepseek-ai/dsh-tool-lsp'
