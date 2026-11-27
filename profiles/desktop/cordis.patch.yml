@@ -46,15 +46,6 @@
               - image
     apiKeyEnv: MINIMAX_API_KEY
 
-# ---------------------------------------------------------------- 压缩保留量
-# compaction-basic 默认按 retainRatio 0.16 算保留量,但阈值是
-# min(contextWindow×0.8, contextWindow − maxTokens − headroom)。maxTokens 大的模型
-# (MiniMax 是 131072)会把阈值压到 8192,而保留量算出 11796 —— 大于阈值,切模型时
-# 压缩校验必然失败( MODEL_SWITCH_COMPACTION_FAILED)。显式给一个绝对保留量。
-- id: compaction-basic
-  config:
-    retainTokens: 4096
-
 # ---------------------------------------------------------------- 界面偏好
 - id: ui-settings-account
   name: "@deepseek-ai/dsh-client-ui-settings-account"

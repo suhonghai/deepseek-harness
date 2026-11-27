@@ -61,7 +61,13 @@ echo "  模板: $template_dir"
 
 installed=0
 
-if [ "$mode" != "packaged" ]; then
+# 显式指定 DSH_HOME 时,只装那一个 home —— 桌面端与 web 端各用一个 home,
+# 否则它们会抢同一个会话的写锁(会话被占用)。
+if [ -n "${DSH_HOME:-}" ]; then
+  install_profile "$DSH_HOME" "指定 home"
+  install_profile "$DSH_HOME" "指定 home" "workbench-web"
+  installed=1
+elif [ "$mode" != "packaged" ]; then
   dev_home="$repo_root/apps/desktop/.desktop-dev/home"
   if [ -d "$dev_home" ]; then
     install_profile "$dev_home" "desktop 开发态"
