@@ -10,7 +10,6 @@
  */
 
 import type { ReactNode } from 'react'
-import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type { ArticlesObservable } from './articles-store.ts'
 import css from './WorkbenchTab.module.css'
@@ -20,8 +19,6 @@ export interface WorkbenchFace {
   readonly hooks: {
     readonly articles: ArticlesObservable
   }
-  /** Leave the workbench and return to the named Session's conversation. */
-  readonly openChat: (sessionId: SessionId) => void
 }
 
 /** Full component props assembled by the sidebar-right tab renderer. */
@@ -41,7 +38,7 @@ function formatTime(value: number): string {
  * @returns the tab body element.
  */
 export function WorkbenchTab(props: WorkbenchTabProps): ReactNode {
-  const { t, useArticles, useProjection, openChat, sessionId } = props
+  const { t, useArticles, useProjection } = props
   const projection = useProjection('promptDraft')
   const draft = projection?.draft ?? null
   const articles = useArticles(state => state)
@@ -74,9 +71,6 @@ export function WorkbenchTab(props: WorkbenchTabProps): ReactNode {
               <span>{t('draftUpdated')} {formatTime(projection?.updatedAt ?? 0)}</span>
               <span>{draft.revision - 1} {t('draftVersions')}</span>
             </div>
-            <button type="button" className={css.action} onClick={() => { openChat(sessionId) }}>
-              {t('continueInChat')}
-            </button>
           </div>
         )}
       </section>

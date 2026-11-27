@@ -17,7 +17,6 @@
  */
 
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
-import type { SessionId } from '@deepseek-ai/dsh-session/types'
 // Type-only: pulls the locale plugin's Context merge (ctx.locale).
 import type {} from '@deepseek-ai/dsh-client-locale/client'
 // Type-only: pulls the slot registry's Context merge (ctx.slots).
@@ -83,10 +82,7 @@ export async function apply(ctx: ClientContext): Promise<() => Promise<void>> {
         name: 'sidebar.right.pane.tab',
         key: TAB_ID,
         locale: NS,
-        inject: (): WorkbenchFace => ({
-          hooks: { articles },
-          openChat: (sessionId: SessionId) => { uiCtx.uiWorkspace.openSession(sessionId) },
-        }),
+        inject: (): WorkbenchFace => ({ hooks: { articles } }),
       }, WorkbenchTab))
     })
 

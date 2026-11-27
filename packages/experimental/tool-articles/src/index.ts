@@ -44,8 +44,9 @@ const GET_DESCRIPTION =
   'Read one saved article by the id list_articles returned. The result carries the full article body.'
 
 const SAVE_DESCRIPTION =
-  'Store an article in the workbench library, or revise one already there. Pass the id of an existing '
-  + 'article to replace it; omit the id to store a new piece. The library is shared by every conversation.'
+  'Store a finished article in the workbench library, or revise one already there. Call it after the piece is '
+  + 'written, so the library keeps what the author can open later. Pass the id of an existing article to replace '
+  + 'it; omit the id to store a new piece. The library is shared by every conversation.'
 
 /** One article as the list shows it. */
 interface ArticleSummary {
@@ -186,6 +187,11 @@ export function apply(ctx: Context): void {
       'The workbench keeps saved articles in a durable library that every conversation shares.',
       'Call list_articles to see which articles exist, and get_article with an article id to read one.',
       'Call save_article to store a finished piece in the library; pass the id of an existing article to revise it.',
+      'When the user asks you to write, produce, or generate an article — including when they name the current',
+      'prompt draft and say to generate from it — write the finished piece first, then store it with save_article',
+      'before reporting the work as done. The article body is the finished text; the title is its title; the',
+      'status is "draft" unless the user asked to publish it. The library holds finished pieces only: never store',
+      'planning notes, outlines, or intermediate drafts.',
       '</article_library>',
     ].join('\n'),
     interpolate: false,

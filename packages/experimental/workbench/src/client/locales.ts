@@ -21,7 +21,6 @@ export type WorkbenchKey =
   | 'draftRevision'
   | 'draftUpdated'
   | 'draftVersions'
-  | 'continueInChat'
   | 'articlesEmpty'
   | 'articlesEmptyHint'
   | 'articleStatusDraft'
@@ -51,7 +50,6 @@ const en: Record<WorkbenchKey, string> = {
   draftRevision: 'Revision',
   draftUpdated: 'Updated',
   draftVersions: 'revisions',
-  continueInChat: 'Continue in chat',
   articlesEmpty: 'No articles yet',
   articlesEmptyHint: 'Ask the agent to write one and it will appear here.',
   articleStatusDraft: 'draft',
@@ -82,7 +80,6 @@ const zh: Record<WorkbenchKey, string> = {
   draftRevision: '修订',
   draftUpdated: '更新于',
   draftVersions: '个历史版本',
-  continueInChat: '继续在对话里打磨',
   articlesEmpty: '还没有文章',
   articlesEmptyHint: '让 agent 写一篇，成稿会出现在这里。',
   articleStatusDraft: '草稿',
@@ -113,7 +110,6 @@ const ja: Record<WorkbenchKey, string> = {
   draftRevision: 'リビジョン',
   draftUpdated: '更新',
   draftVersions: '件の履歴',
-  continueInChat: '会話で続けて磨く',
   articlesEmpty: '記事はまだありません',
   articlesEmptyHint: 'エージェントに書かせるとここに表示されます。',
   articleStatusDraft: '下書き',
@@ -144,7 +140,6 @@ const es: Record<WorkbenchKey, string> = {
   draftRevision: 'Revisión',
   draftUpdated: 'Actualizado',
   draftVersions: 'revisiones',
-  continueInChat: 'Continuar en el chat',
   articlesEmpty: 'Aún no hay artículos',
   articlesEmptyHint: 'Pide al agente que escriba uno y aparecerá aquí.',
   articleStatusDraft: 'borrador',
@@ -175,7 +170,6 @@ const fr: Record<WorkbenchKey, string> = {
   draftRevision: 'Révision',
   draftUpdated: 'Mis à jour',
   draftVersions: 'révisions',
-  continueInChat: 'Continuer dans le chat',
   articlesEmpty: 'Aucun article',
   articlesEmptyHint: 'Demandez à l’agent d’en écrire un ; il apparaîtra ici.',
   articleStatusDraft: 'brouillon',
@@ -206,7 +200,6 @@ const de: Record<WorkbenchKey, string> = {
   draftRevision: 'Revision',
   draftUpdated: 'Aktualisiert',
   draftVersions: 'Revisionen',
-  continueInChat: 'Im Chat weiterarbeiten',
   articlesEmpty: 'Noch keine Artikel',
   articlesEmptyHint: 'Lass den Agenten einen schreiben — er erscheint hier.',
   articleStatusDraft: 'Entwurf',
@@ -237,7 +230,6 @@ const ru: Record<WorkbenchKey, string> = {
   draftRevision: 'Ревизия',
   draftUpdated: 'Обновлено',
   draftVersions: 'версий',
-  continueInChat: 'Продолжить в чате',
   articlesEmpty: 'Статей пока нет',
   articlesEmptyHint: 'Попросите агента написать — статья появится здесь.',
   articleStatusDraft: 'черновик',
@@ -268,7 +260,6 @@ const pt: Record<WorkbenchKey, string> = {
   draftRevision: 'Revisão',
   draftUpdated: 'Atualizado',
   draftVersions: 'revisões',
-  continueInChat: 'Continuar no chat',
   articlesEmpty: 'Ainda não há artigos',
   articlesEmptyHint: 'Peça ao agente para escrever um e ele aparecerá aqui.',
   articleStatusDraft: 'rascunho',
