@@ -27,7 +27,8 @@ esac
 install_profile() {
   local home="$1"
   local label="$2"
-  local dir="$home/profiles/desktop"
+  local profile_name="${3:-desktop}"
+  local dir="$home/profiles/$profile_name"
 
   mkdir -p "$dir"
   for file in package.json cordis.patch.yml cordis.yml pnpm-workspace.yaml; do
@@ -63,7 +64,10 @@ installed=0
 if [ "$mode" != "packaged" ]; then
   dev_home="$repo_root/apps/desktop/.desktop-dev/home"
   if [ -d "$dev_home" ]; then
-    install_profile "$dev_home" "开发态"
+    install_profile "$dev_home" "desktop 开发态"
+    # web 端验证用的 profile:与 desktop 同一套 bundles 与删减,只换 profile 名。
+    # 它同样必须同步,否则模板里的改动(例如 provider 的 baseURL)不会生效。
+    install_profile "$dev_home" "web 开发态" "workbench-web"
     installed=1
   elif [ "$mode" = "dev" ]; then
     echo "  开发态: 尚未初始化(先跑一次 pnpm run start:desktop),跳过" >&2
@@ -86,8 +90,9 @@ fi
 # 凭据不进版本控制,单独提醒。
 if [ -z "${MINIMAX_API_KEY:-}" ] && [ ! -f "$repo_root/.env" ]; then
   echo ""
-  echo "  ⚠ 未找到 MINIMAX_API_KEY,也没有根 .env —— 模型调用会失败。"
-  echo "    在仓库根建 .env:  MINIMAX_API_KEY=<key>"
+  echo "  ⚠ 环境变量里没有 MINIMAX_API_KEY,根目录也没有 .env。"
+  echo "    不过凭据可以走托管文档:$DSH_HOME/.credentials.yaml 的 refs 段,"
+  echo "    由 DSH 按请求解析(见 profiles/desktop/cordis.patch.yml 的 apiKeyEnv)。"
 fi
 
 echo ""
