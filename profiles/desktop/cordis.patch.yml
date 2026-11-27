@@ -28,13 +28,18 @@
           - id: MiniMax-M2.7
             name: MiniMax-M2.7
             contextWindow: 204800
-            maxTokens: 131072
+            # maxTokens 是单次请求预留的输出量,它直接吃掉上下文窗口:压缩阈值取
+            # min(contextWindow×0.8, contextWindow − maxTokens − headroom)。
+            # 131072 会把 204800 窗口的 64% 留给输出,阈值只剩 8192,切模型时
+            # 任何稍长的会话都压不下去。65536 让阈值回到 73728。
+            maxTokens: 65536
             input:
               - text
           - id: MiniMax-M2.7-highspeed
             name: MiniMax-M2.7-highspeed
             contextWindow: 204800
-            maxTokens: 131072
+            # 同 MiniMax-M2.7:maxTokens 预留过多会把压缩阈值压到无法压缩。
+            maxTokens: 65536
             input:
               - text
           - id: MiniMax-M3

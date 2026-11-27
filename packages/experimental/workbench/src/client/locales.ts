@@ -3,6 +3,8 @@
 /** Locale keys the workbench surfaces render. */
 export type WorkbenchKey =
   | 'nav'
+  | 'tabTitle'
+  | 'tabGuide'
   | 'title'
   | 'intro'
   | 'sectionArticles'
@@ -30,6 +32,8 @@ export type WorkbenchKey =
 
 /** English copy of the workbench surfaces. */
 const en: Record<WorkbenchKey, string> = {
+  tabTitle: 'Workbench',
+  tabGuide: 'The prompt you and the agent refine together, plus your articles.',
   nav: 'Workbench',
   title: 'Workbench',
   intro: 'Draft the prompt that generates your articles, then keep refining it in conversation.',
@@ -59,6 +63,8 @@ const en: Record<WorkbenchKey, string> = {
 
 /** Chinese copy of the workbench surfaces. */
 const zh: Record<WorkbenchKey, string> = {
+  tabTitle: '工作台',
+  tabGuide: '你和 agent 一起打磨的提示词,以及你的文章。',
   nav: '工作台',
   title: '工作台',
   intro: '先打磨生成文章用的提示词,再在对话里继续让它变好。',
@@ -88,6 +94,8 @@ const zh: Record<WorkbenchKey, string> = {
 
 /** Japanese copy of the workbench surfaces. */
 const ja: Record<WorkbenchKey, string> = {
+  tabTitle: 'ワークベンチ',
+  tabGuide: 'エージェントと一緒に打磨したプロンプトと記事。',
   nav: 'ワークベンチ',
   title: 'ワークベンチ',
   intro: '記事生成用のプロンプトを書き、会話を通じて磨き込みます。',
@@ -117,6 +125,8 @@ const ja: Record<WorkbenchKey, string> = {
 
 /** Spanish copy of the workbench surfaces. */
 const es: Record<WorkbenchKey, string> = {
+  tabTitle: 'Banco de trabajo',
+  tabGuide: 'El prompt que refinas con el agente y tus artículos.',
   nav: 'Banco de trabajo',
   title: 'Banco de trabajo',
   intro: 'Redacta el prompt que genera tus artículos y sigue mejorándolo en la conversación.',
@@ -146,6 +156,8 @@ const es: Record<WorkbenchKey, string> = {
 
 /** French copy of the workbench surfaces. */
 const fr: Record<WorkbenchKey, string> = {
+  tabTitle: 'Atelier',
+  tabGuide: 'Le prompt que vous affinez avec l’agent et vos articles.',
   nav: 'Atelier',
   title: 'Atelier',
   intro: 'Rédigez le prompt qui génère vos articles, puis affinez-le en conversation.',
@@ -175,6 +187,8 @@ const fr: Record<WorkbenchKey, string> = {
 
 /** German copy of the workbench surfaces. */
 const de: Record<WorkbenchKey, string> = {
+  tabTitle: 'Werkbank',
+  tabGuide: 'Der Prompt, den du mit dem Agenten verfeinerst, und deine Artikel.',
   nav: 'Werkbank',
   title: 'Werkbank',
   intro: 'Verfasse den Prompt für deine Artikel und verfeinere ihn im Gespräch.',
@@ -204,6 +218,8 @@ const de: Record<WorkbenchKey, string> = {
 
 /** Russian copy of the workbench surfaces. */
 const ru: Record<WorkbenchKey, string> = {
+  tabTitle: 'Рабочий стол',
+  tabGuide: 'Промпт, который вы дорабатываете вместе с агентом, и ваши статьи.',
   nav: 'Рабочий стол',
   title: 'Рабочий стол',
   intro: 'Составьте промпт для генерации статей и дорабатывайте его в диалоге.',
@@ -233,6 +249,8 @@ const ru: Record<WorkbenchKey, string> = {
 
 /** Portuguese copy of the workbench surfaces. */
 const pt: Record<WorkbenchKey, string> = {
+  tabTitle: 'Bancada',
+  tabGuide: 'O prompt que você refina com o agente e seus artigos.',
   nav: 'Bancada',
   title: 'Bancada',
   intro: 'Escreva o prompt que gera seus artigos e continue refinando-o na conversa.',

@@ -1,39 +1,47 @@
 /**
- * 自媒体工作台的浏览器面:注册工作台主面板与左侧栏入口。
+ * 自媒体工作台的浏览器面:注册右侧栏的工作台 tab。
  *
- * 面板挂在 ui-layout 的 `main` keyed slot 上,左侧栏图标挂在 `sidebar.panellist`
- * list slot 上 —— 与官方插件管理页(Plugins)走同一条路,所以侧栏的选中态、面板切换
- * 行为都由 ui-layout / ui-sidebar 负责,这里只提供内容。
+ * 工作台挂在 ui-sidebar-right 的 `sidebar.right.pane.tab` keyed slot 上 —— 该 slot 是
+ * session scope,标准 props 直接带 `sessionId` 与 `useProjection`,所以面板读到的就是
+ * **当前会话**的草稿。
+ *
+ * 之所以不做成 `main` 全局面板:主列被 main 面板占据时右侧栏整体隐藏,两者无法共存
+ * 同一屏 —— 工作台要「在会话旁边看」,就只能进右侧栏。
+ *
+ * 注册分两段(与 ui-plan / ui-deliverables 同构):先在 `ctx.sidebarRightTabs` 登记
+ * 这个 tab 类型,再把 body 注册到 keyed slot,slot 的 key 必须等于类型的 id。
  *
  * 数据走两条通道:草稿用会话投影(Control Stream 实时推送),文章库用挂载的
- * `articles` Remote。面板是全局面板,不绑定单个会话。
+ * `articles` Remote。文章库是全局的,所以它的 store 在插件实例上创建一次,由各会话的
+ * tab body 共享。
  */
 
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
-import type { MainPanelId } from '@deepseek-ai/dsh-client-ui-layout/client'
-import remote from '@deepseek-ai/dsh-workbench/remote'
 // Type-only: pulls the locale plugin's Context merge (ctx.locale).
 import type {} from '@deepseek-ai/dsh-client-locale/client'
 // Type-only: pulls the slot registry's Context merge (ctx.slots).
 import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
-// Type-only: pulls the sidebar's SlotMap merge (the 'sidebar.panellist' entry).
-import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
-// Type-only: pulls ctx.remote / ctx.uiWorkspace / ctx.sessions merges.
+// Type-only: pulls ctx.remote / ctx.uiWorkspace merges.
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
 import type {} from '@deepseek-ai/dsh-client-ui-workspace/client'
 import type {} from '@deepseek-ai/dsh-api-session-controller/client'
-import type { WorkbenchFace } from './WorkbenchPage.tsx'
-import { WorkbenchPage } from './WorkbenchPage.tsx'
-import { WorkbenchPanelIcon } from './WorkbenchPanelIcon.tsx'
+// Type-only: pulls the sidebar-right's Context merge (ctx.sidebarRight / ctx.sidebarRightTabs).
+import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
+import remote from '@deepseek-ai/dsh-workbench/remote'
+import type { WorkbenchFace } from './WorkbenchTab.tsx'
+import { WorkbenchTab } from './WorkbenchTab.tsx'
 import { createArticlesStore } from './articles-store.ts'
 import { de, en, es, fr, ja, pt, ru, zh, type WorkbenchKey } from './locales.ts'
 
 /** Locale namespace of the workbench surfaces. */
 export const NS = 'workbench'
 
-/** Main panel id of the workbench panel. */
-export const PANEL_ID = 'workbench' as MainPanelId
+/** Tab type id of the workbench panel; the keyed slot registers under this id. */
+export const TAB_ID = '@deepseek-ai/dsh-workbench'
+
+/** Tab kind the workbench panel opens under. */
+export const TAB_KIND = 'workbench'
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
@@ -43,10 +51,10 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 }
 
 /** Services required by the workbench client plugin. */
-export const inject = ['slots', 'locale', 'layout', 'remote', 'uiWorkspace']
+export const inject = ['slots', 'locale', 'remote', 'uiWorkspace', 'sidebarRight', 'sidebarRightTabs']
 
 /**
- * Mount the workbench Remote, then its panel and sidebar entry.
+ * Mount the workbench Remote, then its sidebar-right tab type and body.
  * @param ctx - the browser plugin context.
  * @returns a disposer that removes the Remote when the plugin is torn down.
  */
@@ -54,29 +62,32 @@ export async function apply(ctx: ClientContext): Promise<() => Promise<void>> {
   const disposeRemote = await ctx.remote.$mount(remote)
   try {
     ctx.effect(() => ctx.locale.register(NS, { zh, en, ja, es, fr, de, ru, pt }), 'workbench: dictionaries')
-    // Wait for the mounted `articles` namespace before the panel's store reads it.
-    const ui = await ctx.inject(['remote.articles', 'slots', 'locale', 'uiWorkspace'], (uiCtx) => {
+    // Wait for the mounted `articles` namespace before the tab body reads it.
+    const ui = await ctx.inject(['remote.articles', 'slots', 'locale', 'uiWorkspace', 'sidebarRight', 'sidebarRightTabs'], (uiCtx) => {
       const articles = createArticlesStore(uiCtx)
 
-      uiCtx.slots.inject('main', function* () {
-        yield uiCtx.slots.register({
-          name: 'main',
-          key: PANEL_ID,
-          locale: NS,
-          inject: (): WorkbenchFace => ({
-            hooks: { articles },
-            openChat: (sessionId: SessionId) => { uiCtx.uiWorkspace.openSession(sessionId) },
-          }),
-        }, WorkbenchPage)
-      })
+      uiCtx.effect(() => uiCtx.sidebarRightTabs.register({
+        id: TAB_ID,
+        kind: TAB_KIND,
+        priority: 'builtin',
+        title: () => uiCtx.locale.bind(NS)('tabTitle'),
+        guide: [{
+          id: TAB_KIND,
+          order: 60,
+          title: () => uiCtx.locale.bind(NS)('tabTitle'),
+          description: () => uiCtx.locale.bind(NS)('tabGuide'),
+        }],
+      }), 'workbench: sidebar tab type')
 
-      uiCtx.slots.inject('sidebar.panellist', () => uiCtx.slots.register({
-        name: 'sidebar.panellist',
-        id: PANEL_ID,
-        order: 5,
+      uiCtx.slots.inject('sidebar.right.pane.tab', () => uiCtx.slots.register({
+        name: 'sidebar.right.pane.tab',
+        key: TAB_ID,
         locale: NS,
-        label: () => uiCtx.locale.bind(NS)('nav'),
-      }, WorkbenchPanelIcon))
+        inject: (): WorkbenchFace => ({
+          hooks: { articles },
+          openChat: (sessionId: SessionId) => { uiCtx.uiWorkspace.openSession(sessionId) },
+        }),
+      }, WorkbenchTab))
     })
 
     return async () => { await ui.dispose(); await disposeRemote() }

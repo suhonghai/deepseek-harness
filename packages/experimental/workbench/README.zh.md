@@ -27,7 +27,7 @@ Web 客户端的内容生产工作台 bundle。它贡献一个全局面板 —�
 <a id="use-this-package"></a>
 ## 使用这个包
 
-这个 bundle 给 Web 客户端加一个全局面板。左侧栏出现「工作台」入口,点它把主区域切到工作台面板,点回会话入口则回到聊天。面板列出这个产品的四块面:生成提示词、文章、素材、发布。生成提示词区显示最近更新的那份草稿正文、修订号和一个「继续在对话里打磨」按钮(点它回到产出该草稿的会话);文章区从文章库读出成稿列表,按更新时间倒序列出草稿、待发布、已发布三种状态。素材与发布仍然渲染「尚未实现」标记。
+这个 bundle 给 Web 客户端的**会话右侧栏**加一个 tab。引导页出现「工作台」卡片,点它就在会话旁边打开工作台;不想看时收起分栏,聊天仍是全宽。面板列出这个产品的四块面:生成提示词、文章、素材、发布。生成提示词区读的是**当前会话**的草稿 —— tab 的座位是会话级的,所以它显示的就是这一轮对话的草稿,不再需要在所有会话里挑最新的那份 —— 并渲染正文、修订号、保留的版本数和一个「继续在对话里打磨」按钮;文章区从文章库读出成稿列表,按更新时间倒序列出草稿、待发布、已发布三种状态。素材与发布仍然渲染「尚未实现」标记。
 
 提示词草稿按产品需要的方式工作。你跟 agent 说话,双方一起改同一份文章生成提示词。草稿是会话范围内的状态:agent 用 `get_prompt_draft` 读它、用 `update_prompt_draft` 改写它,你用 `/draft` 命令读它 —— 单独 `/draft` 显示当前文本,`/draft <正文>` 替换正文,`/draft clear` 清空。每次修订都带一个号,bundle 保留被取代的修订,所以你能看到提示词是怎么演变成现在这样的。
 
@@ -40,7 +40,7 @@ Web 客户端的内容生产工作台 bundle。它贡献一个全局面板 —�
 <a id="understand-the-implementation"></a>
 ## 理解实现
 
-这个包有两面。宿主面(`src/index.ts`)装载文章库、提示词草稿域和 `/draft` 命令。浏览器面(`src/client/`)把面板注册到布局服务的 `main` keyed slot、把侧栏入口注册到 `sidebar.panellist` list slot,与官方插件管理页走的是同两个 slot。按钮、标签和选中态由侧栏负责,面板只提供内容。浏览器半在 `apply` 里挂载本包的 `remote` 契约,拿到 `articles` Remote 命名空间,并挂载后卸载对称清理。
+这个包有两面。宿主面(`src/index.ts`)装载文章库、提示词草稿域和 `/draft` 命令。浏览器面(`src/client/`)把工作台注册成右侧栏的一个 tab:先在 `ctx.sidebarRightTabs` 声明 tab 类型,再以同一个 id 把 body 注册到 `sidebar.right.pane.tab` —— 与官方「计划预览」「变更审阅」页走的是同一种两段式注册。该座位是会话级的,所以 body 直接用 `useProjection` 读当前会话的草稿,不需要额外的 API。浏览器半在 `apply` 里挂载本包的 `remote` 契约,拿到 `articles` Remote 命名空间,并挂载后卸载对称清理。
 
 宿主面在 `src/host/` 下按职责一个文件一个文件地拆开。`article-domain.ts` 放文章域声明、记录 schema 和 Remote 边界类型;`article-service.ts` 拥有 `ctx.articles` 服务(base bundle 的 storage-domain / json 后端)。`types.ts` 聚合两个域的纯类型,是包 `./types` 子路径的落点。`draft-types.ts` 放纯类型和 `promptDraft` 投影键声明,不含宿主导入,浏览器半因此能投影同一份内容。`draft-domain.ts` 放持久变更载荷和 `prompt-draft/change` 会话事件。`draft-fold.ts` 是纯回放折叠与它的严格解码器。`draft-runtime.ts` 放错误码与变更版本。`draft-service.ts` 拥有 `ctx.promptDrafts` 服务,`draft-command.ts` 拥有面向用户的入口。面向模型的两块面各自独立成包 —— `@deepseek-ai/dsh-tool-prompt-draft` 与 `@deepseek-ai/dsh-tool-articles` —— 因为工具注册发生在挂载它的 Agent 作用域内,由工作台 preset 决定哪些 agent 获得它们。
 
@@ -56,8 +56,8 @@ Web 客户端的内容生产工作台 bundle。它贡献一个全局面板 —�
 ## 进一步探索
 
 - `packages/client/ui-layout` —— `main` slot 与切换主区域的 `selectPanel`
-- `packages/client/ui-sidebar` —— 侧栏渲染的面板列表
-- `packages/client/ui-plugin-manager` —— 以同样方式注册 `main` 面板的官方页面
+- `packages/client/ui-sidebar-right` —— 会话右侧栏:tab 座位、引导页与收起控制
+- `packages/client/ui-plan` —— 以同样方式注册右侧栏 tab 的官方页面
 - `packages/preset/agent-preset-registry` —— 会话运行的 Agent 预设
 - `packages/goal/goal` —— 同一种会话内事件溯源域的形状,只是 goal 另有草稿不需要的续跑生命周期
 
@@ -77,7 +77,7 @@ Web 客户端的内容生产工作台 bundle。它贡献一个全局面板 —�
 
 #### 模型看到什么
 
-面板本身不贡献任何东西。面板是浏览器侧的视图:浏览器半为 `main` 与 `sidebar.panellist` 两个 slot 调用 `ctx.slots.register`,面板不贡献工具、不贡献提示词小节、也不贡献会话事件。
+面板本身不贡献任何东西。面板是浏览器侧的视图:浏览器半为 `sidebar.right.pane.tab` 座位调用 `ctx.sidebarRightTabs.register` 与 `ctx.slots.register`,面板不贡献工具、不贡献提示词小节、也不贡献会话事件。
 
 #### Token 影响
 

@@ -83,12 +83,20 @@
               - id: compaction-basic
                 name: '@deepseek-ai/dsh-compaction-basic'
                 config:
-                  # compaction-basic 的阈值取 min(contextWindow×0.8, contextWindow −
-                  # maxTokens − headroom),而保留量按 retainRatio 0.16 算。maxTokens 大的
-                  # 模型(MiniMax 是 131072)会把阈值压到 8192,保留量却算出 11796 ——
-                  # 大于阈值,切模型时压缩校验必然失败(MODEL_SWITCH_COMPACTION_FAILED)。
-                  # 显式给绝对保留量。
-                  retainTokens: 4096
+                  # 压缩阈值 = min(contextWindow×0.8, contextWindow − 请求预留的 maxTokens − headroom)。
+                  # 模型目录里的 maxTokens 是每次请求预留的输出量,minimax 的 131072 会从 204800 的
+                  # 窗口扣掉 64%,阈值只剩 8192 —— 任何稍长的会话都压不下去,切模型必然失败
+                  # (MODEL_SWITCH_COMPACTION_FAILED)。官方 DeepSeek 目录因此干脆不声明 maxTokens。
+                  # 这里按模型精确覆盖:压缩只预留 8192 输出,保留 4096 上下文。
+                  modelPolicies:
+                    - provider: minimax
+                      model: MiniMax-M2.7
+                      headroomTokens: 8192
+                      retainTokens: 4096
+                    - provider: minimax
+                      model: MiniMax-M2.7-highspeed
+                      headroomTokens: 8192
+                      retainTokens: 4096
               - id: command-compact
                 name: '@deepseek-ai/dsh-command-compact'
               - id: tool-result-pruner

@@ -9,7 +9,7 @@ English | [中文](README.zh.md)
 
 ## Summary
 
-A publishing workbench bundle for the Web client. It contributes one global panel — the workbench a creator works in — and the four surfaces that product is made of: the generation prompt the agent refines with the author, the article library, the asset library, and the publishing queue. The generation prompt and article library are wired to real data; the other two are placeholders.
+A publishing workbench bundle for the Web client. It contributes one sidebar-right tab — the workbench a creator works in beside the conversation — and the four surfaces that product is made of: the generation prompt the agent refines with the author, the article library, the asset library, and the publishing queue. The generation prompt and article library are wired to real data; the other two are placeholders.
 
 The prompt draft is the bundle's host capability. It is one draft per session, persisted in the session log, with a revision the model and the user compare against each other.
 
@@ -27,7 +27,7 @@ The prompt draft is the bundle's host capability. It is one draft per session, p
 <a id="use-this-package"></a>
 ## Use this package
 
-The bundle contributes one global panel to the Web client. The sidebar gains a Workbench entry; choosing it swaps the main area over to the workbench panel, and choosing the conversation entry returns to the chat. The panel lists the four surfaces the product is made of: the generation prompt, articles, assets, and publishing. The generation-prompt section shows the most recently updated draft's body, revision, and a "continue in chat" button that returns to the Session that produced it; the articles section reads the library and lists stored pieces newest-first across draft / ready / published states. Assets and publishing still render a "not built yet" badge.
+The bundle contributes one tab to the session's sidebar-right column. The guide page gains a Workbench card; choosing it opens the tab beside the conversation, and the column collapses on demand so the chat keeps the full width. The panel lists the four surfaces the product is made of: the generation prompt, articles, assets, and publishing. The generation-prompt section reads the **current Session's** draft — the tab's seat is session-scoped, so it shows that conversation's draft rather than one picked across every Session — and renders its body, revision, retained version count, and a "continue in chat" button; the articles section reads the library and lists stored pieces newest-first across draft / ready / published states. Assets and publishing still render a "not built yet" badge.
 
 The prompt draft works the way the product needs it to. You talk to the agent and you both edit one article-generation prompt. The draft is a session-scoped state: the agent reads it with `get_prompt_draft` and rewrites it with `update_prompt_draft`, and you read it with the `/draft` command — `/draft` on its own shows the current text, `/draft <text>` replaces the body, and `/draft clear` empties it. Every revision carries a number, and the bundle keeps the superseded revisions so you can see how the prompt got to where it is.
 
@@ -40,7 +40,7 @@ Installing the bundle is what puts the panel on screen and the draft in the sess
 <a id="understand-the-implementation"></a>
 ## Understand the implementation
 
-The package has two faces. The host face (`src/index.ts`) mounts the article library, the prompt-draft domain, and the `/draft` command. The browser face (`src/client/`) registers the panel on the `main` keyed slot of the layout service and the sidebar entry on the `sidebar.panellist` list slot, the same two slots the shipped Plugins page uses. The sidebar owns the button, the label, and the selected state; the panel contributes content only. The browser face mounts this package's `remote` contract in `apply`, gains the `articles` Remote namespace, and tears the Remote down symmetrically with the UI.
+The package has two faces. The host face (`src/index.ts`) mounts the article library, the prompt-draft domain, and the `/draft` command. The browser face (`src/client/`) registers the workbench as a sidebar-right tab: it declares the tab type in `ctx.sidebarRightTabs` and registers its body under `sidebar.right.pane.tab` with the same id, the two-step registration the shipped Plan preview and Changes review pages use. The seat is session-scoped, so the body reads the current Session's draft through `useProjection` with no extra API. The browser face mounts this package's `remote` contract in `apply`, gains the `articles` Remote namespace, and tears the Remote down symmetrically with the UI.
 
 The host face is split into one file per concern under `src/host/`. `article-domain.ts` holds the domain declaration, record schema, and Remote boundary types; `article-service.ts` owns `ctx.articles` (over the base bundle's storage-domain / json backend). `types.ts` aggregates both domains' pure types and is the package's `./types` subpath. `draft-types.ts` holds the pure types and the `promptDraft` projection-key declaration, free of host imports so the browser half can project the same content. `draft-domain.ts` holds the durable change payloads and the `prompt-draft/change` session event. `draft-fold.ts` is the pure replay fold and its strict decoder. `draft-runtime.ts` holds the error codes and the change version. `draft-service.ts` owns the `ctx.promptDrafts` service and `draft-command.ts` owns the human-facing surface. The two model-facing surfaces live in their own packages, `@deepseek-ai/dsh-tool-prompt-draft` and `@deepseek-ai/dsh-tool-articles`, because a tool registers inside the Agent scope that mounts it and the workbench preset decides which agents receive them.
 
@@ -77,7 +77,7 @@ The draft's body is rendered into the system prompt through a section whose text
 
 #### What the model sees
 
-Nothing from the panel itself. The panel is a client-side view: the browser face calls `ctx.slots.register` for the `main` and `sidebar.panellist` slots, and the panel contributes no tool, no prompt section, and no session event.
+Nothing from the panel itself. The panel is a client-side view: the browser face calls `ctx.sidebarRightTabs.register` and `ctx.slots.register` for the `sidebar.right.pane.tab` seat, and the panel contributes no tool, no prompt section, and no session event.
 
 #### Token effect
 

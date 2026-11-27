@@ -21,8 +21,8 @@
 
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 24px;
+  gap: 16px;
+  padding: 12px;
   overflow-y: auto;
   height: 100%;
   font-family: var(--wb-font);
@@ -49,9 +49,9 @@
 }
 
 .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .card {
@@ -63,11 +63,6 @@
   border-radius: var(--wb-radius);
   background: var(--wb-card-bg);
   box-shadow: var(--wb-shadow);
-}
-
-/* The prompt draft occupies the full row; the other three faces share the next. */
-.cardWide {
-  grid-column: 1 / -1;
 }
 
 .cardTitle {

@@ -140,10 +140,22 @@ for (const label of ['继续', 'Continue', '知道了', '跳过']) {
   const btn = page.getByRole('button', { name: label, exact: true })
   if (await btn.count() > 0) { try { await btn.first().click({ timeout: 3000, force: true }); break } catch {} }
 }
-const entry = page.getByText('工作台', { exact: true })
-if (await entry.count() === 0) { console.error('侧栏没有「工作台」入口'); await browser.close(); process.exit(1) }
-await entry.first().click()
-await page.waitForTimeout(1800)
+// 工作台是右侧栏的 tab,而右侧栏只在会话视图下存在:先打开一个会话。
+const tree = page.locator('[role="tree"]')
+if (await tree.count() > 0) {
+  const row = tree.locator('text=/./').first()
+  if (await row.count() > 0) { await row.click(); await page.waitForTimeout(2000) }
+}
+// 面板收起时,会话标题栏角落有展开按钮。
+try {
+  const expand = page.locator('[data-sidebar-right-expand]')
+  if (await expand.count() > 0) { await expand.first().click({ timeout: 2500 }); await page.waitForTimeout(1500) }
+} catch {}
+// guide 页的卡片是可点元素;tab strip 里也有同名标题,所以按 button 定位并 force 点击。
+const entry = page.locator('button, [role="button"]').filter({ hasText: '工作台' }).first()
+if (await entry.count() === 0) { console.error('右侧栏没有「工作台」入口'); await browser.close(); process.exit(1) }
+await entry.click({ force: true })
+await page.waitForTimeout(2200)
 const body = await page.locator('body').innerText()
 const must = ['生成提示词', '文章', '素材', '发布']
 const missing = must.filter(t => !body.includes(t))
@@ -160,7 +172,7 @@ MJS
     return $rc
   }
 
-  run_check "web 端:侧栏入口 + 面板四块面 + 零 console 错误" web_check
+  run_check "web 端:右侧栏工作台 tab + 面板四块面 + 零 console 错误" web_check
 fi
 
 # ---------------------------------------------------------------- 汇总
